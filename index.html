@@ -603,6 +603,8 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
 .fb-source-note,.rev-warn{background:#fef9e7!important;border:1px solid #f0c040!important;color:#7d5a00!important;border-radius:6px;padding:8px 10px;margin-top:10px;font-size:12px;line-height:1.55}
 .exhibit-box{border:1px solid var(--card-border);background:#f8fafc;border-radius:8px;margin:0 0 18px;overflow:hidden}
 .exhibit-title{background:#eef4fb;border-bottom:1px solid var(--card-border);padding:9px 14px;font-size:11px;font-weight:800;color:var(--header);text-transform:uppercase;letter-spacing:.05em}
+.exhibit-content{padding:14px}
+.exhibit-img{display:block;max-width:100%;height:auto;margin:0 auto 12px;border:1px solid var(--card-border);border-radius:6px;background:#fff}
 .net-diagram{position:relative;min-height:270px;padding:18px;background:#fff;overflow:hidden}
 .net-svg{width:100%;height:270px;display:block}
 .net-node{fill:#fff;stroke:#1a3a5c;stroke-width:2}
@@ -611,6 +613,11 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
 .net-label{font:700 12px var(--font);fill:#1a1a2e}.net-small{font:600 10px var(--mono);fill:#555e6d}
 .net-note{font:600 10px var(--font);fill:#7d5a00}
 .cli-output{background:#101828;color:#e5eefb;font-family:var(--mono);font-size:12px;line-height:1.55;padding:14px;overflow:auto;white-space:pre;border-top:1px solid #26364c}
+.command-wrap{display:flex;flex-direction:column;gap:10px}
+.command-input{width:100%;border:2px solid var(--opt-border);border-radius:8px;padding:13px 14px;font-family:var(--mono);font-size:15px;color:var(--text);background:var(--card)}
+.command-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,102,204,.15)}
+.command-input.ok{border-color:var(--green-border);background:var(--green-bg)}
+.command-input.err{border-color:var(--red-border);background:var(--red-bg)}
 @media(max-width:700px){.q-mobile-toggle{display:block!important}.qnav-card{grid-column:1/-1}.qnav-grid{max-height:126px;overflow:auto}.net-svg{height:330px}.net-diagram{min-height:330px;padding:10px}}
 
 
@@ -1129,7 +1136,7 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
     <div class="reviewer-card" onclick="goTopics('IT0035')">
       <div class="reviewer-icon">💿</div>
       <div class="reviewer-title">IT0035</div>
-      <div class="reviewer-desc">Practice questions loaded from the IT0035 FA1 markdown file.</div>
+      <div class="reviewer-desc">Canvas FA1 plus NetAcad NDG chapter exams, kept together under IT0035.</div>
       <div class="reviewer-stats" id="rev-stats-IT0035">
         <span class="rev-stat-pill rev-stat-total" id="rev-total-IT0035">Loading modules</span>
         <span class="rev-stat-pill rev-stat-none" id="rev-score-IT0035">Not started</span>
@@ -1810,15 +1817,17 @@ let TOPIC_GROUPS = {};
 
 const SUBJECT_FILES = [
   {src:'IT0015', topic:'Formative Assessment 1', title:'IT0015 Networking FA1', file:'IT0015/FA1.md'},
+  {src:'IT0015', topic:'Formative Assessment 2', title:'IT0015 Networking FA2', file:'IT0015/FA2.md'},
   {src:'NETWORKING', topic:'CCST Networking Cert', title:'CCST Networking Cert', file:'CCSTNETWORKINGCERT/Networking.md'},
-  {src:'IT0035', topic:'Formative Assessment 1', title:'IT0035 Formative Assessment 1', file:'IT0035/FA1.md'},
+  {src:'IT0035', topic:'Canvas FA1', title:'Canvas FA1', file:'IT0035/FA1.md', forceTitle:true},
+  {src:'IT0035', topic:'NetAcad NDG Exams', title:'NetAcad NDG Exams', file:'IT0035/NDGExams.md', prefixSections:true},
   {src:'IT0204', topic:'Formative Assessment 1', title:'IT0204 Formative Assessment 1', file:'IT0204/IT0204/FA1.md'}
 ];
 
 const REVIEWER_META = {
   IT0015: {icon:'🖧', title:'IT0015 Networking', subtitle:'Class reviewer — Cisco commands, VLANs, trunking, topology'},
   NETWORKING: {icon:'🌐', title:'CCST Networking Cert', subtitle:'Certification question bank — CCST Networking'},
-  IT0035: {icon:'💿', title:'IT0035', subtitle:'Operating systems and cloud fundamentals'},
+  IT0035: {icon:'💿', title:'IT0035', subtitle:'Canvas FA1 and NetAcad NDG exams'},
   IT0204: {icon:'🔐', title:'IT0204', subtitle:'Cybersecurity, privacy law, and data protection'}
 };
 
@@ -1849,9 +1858,24 @@ function readMdList(block,label){
 }
 function parseMarkdownQuestions(md,fileMeta,startId){
   const titleMatch = md.match(/^#\s+(.+)$/m);
-  const title = titleMatch ? titleMatch[1].trim() : fileMeta.title;
-  const chunks = md.split(/^##\s+Q\d+\s*$/m).slice(1);
-  return chunks.map((block,i)=>{
+  const fallbackTitle = fileMeta.forceTitle ? fileMeta.title : titleMatch ? titleMatch[1].trim() : fileMeta.title;
+  const chunks = [];
+  let currentTitle = fallbackTitle;
+  md.split(/(?=^#\s+|^##\s+Q\d+\s*$)/m).forEach(block=>{
+    const sectionMatch = block.match(/^#\s+(.+)$/m);
+    if(sectionMatch && !/^##\s+Q\d+/m.test(block)){
+      const sectionTitle = sectionMatch[1].trim();
+      currentTitle = fileMeta.forceTitle ? fileMeta.title : fileMeta.prefixSections ? fileMeta.topic+' · '+sectionTitle : sectionTitle;
+      return;
+    }
+    if(!/^##\s+Q\d+/m.test(block)) return;
+    chunks.push({block, title:currentTitle});
+  });
+  if(!chunks.length){
+    md.split(/^##\s+Q\d+\s*$/m).slice(1).forEach(block=>chunks.push({block,title:fallbackTitle}));
+  }
+  return chunks.map((chunk,i)=>{
+    const block = chunk.block;
     const qText = readMdField(block,'Question');
     const rawType = readMdField(block,'Type').toLowerCase();
     const explanation = readMdField(block,'Explanation');
@@ -1862,7 +1886,7 @@ function parseMarkdownQuestions(md,fileMeta,startId){
       type:rawType==='multi'?'checkbox':rawType==='matching'?'match':'mc',
       q:qText,
       ex:explanation || 'No explanation provided.',
-      moduleTitle:title,
+      moduleTitle:chunk.title,
       file:fileMeta.file
     };
     if(rawType==='matching'){
@@ -1985,20 +2009,50 @@ function parseDigitalForensicsMd(md, fileMeta, startId){
 }
 function readBankField(block,label){
   const lines = block.split(/\r?\n/);
-  const start = lines.findIndex(l=>l.trim().startsWith('**'+label+':**'));
+  const safeLabel = label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const labelRe = new RegExp('^\\s*(?:-\\s*)?\\*\\*'+safeLabel+':\\*\\*\\s*');
+  const start = lines.findIndex(l=>labelRe.test(l));
   if(start<0) return '';
-  const first = lines[start].replace(new RegExp('^\\s*\\*\\*'+label+':\\*\\*\\s*'),'');
+  const first = lines[start].replace(labelRe,'');
   const out = [first];
   for(let i=start+1;i<lines.length;i++){
     const trimmed = lines[i].trim();
-    if(/^\*\*[^*]+:\*\*/.test(trimmed)) break;
+    if(/^(?:-\s*)?\*\*[^*]+:\*\*/.test(trimmed)) break;
     if(/^##\s+Q\d/.test(trimmed) || /^#\s+/.test(trimmed)) break;
     out.push(lines[i]);
   }
   return out.join('\n').trim();
 }
+function readBankTablePairs(block,label){
+  const rows = [];
+  readBankField(block,label).split(/\n/).forEach(line=>{
+    const trimmed = line.trim();
+    if(!/^\|.+\|$/.test(trimmed) || /^\|\s*-/.test(trimmed) || /^\|\s*Item\s*\|/i.test(trimmed)) return;
+    const cells = trimmed.slice(1,-1).split('|').map(c=>cleanBankText(c));
+    if(cells.length>=2 && cells[0] && cells[1]) rows.push({item:cells[0], target:cells[1]});
+  });
+  return rows;
+}
 function readBankList(block,label){
-  return readBankField(block,label).split(/\n/).map(l=>l.trim()).filter(l=>l.startsWith('- ')).map(l=>l.slice(2).trim());
+  const items = [];
+  readBankField(block,label).split(/\n/).forEach(line=>{
+    const trimmed = line.trim();
+    if(trimmed.startsWith('- ')){
+      items.push(trimmed.slice(2).trim());
+    } else if(trimmed && items.length){
+      items[items.length-1] += ' '+trimmed;
+    }
+  });
+  return items;
+}
+function readBankImageFile(block){
+  const m = block.match(/\*Image file:\*\s*`([^`]+)`/i);
+  return m ? m[1].trim() : '';
+}
+function prepareBankAnswer(raw){
+  const text = String(raw||'').trim();
+  const m = text.match(/^NO ANSWER SHOWN IN THE PDF\.\s*Suggested answer(?:\s*\([^)]+\))?:\s*([\s\S]+)$/i);
+  return m ? {text:m[1].trim(), suggested:true} : {text, suggested:false};
 }
 function cleanBankText(s){
   return stripMd(String(s||'').replace(/^`|`$/g,'').trim()).replace(/\s+/g,' ').trim();
@@ -2045,10 +2099,11 @@ function networkingAnswerLabel(explanation){
   return 'PDF Source Answer';
 }
 function hasSourceCaution(q){
-  return q && /⚠|questionable|ambiguous|inferred|cut off|truncated|illegible|no marked answer|not offered|not listed|preserved as|differs from|typo|reserved|cannot be fully verified/i.test(q.ex||'');
+  return q && (q.flag || /⚠|questionable|ambiguous|inferred|cut off|truncated|illegible|no marked answer|not offered|not listed|preserved as|differs from|typo|reserved|cannot be fully verified/i.test(q.ex||''));
 }
 function sourceCautionText(q){
   if(!hasSourceCaution(q)) return '';
+  if(q.flag) return q.flag;
   if((q.answerLabel||'').startsWith('Best Answer')) return 'This item was incomplete, ambiguous, or unmarked in the PDF, so scoring uses the best answer supported by the source context. Read the explanation for the technically correct reasoning.';
   return 'Scoring follows the PDF/reviewer answer. The explanation flags any typo, ambiguity, or technically questionable part so you can study without getting tripped up.';
 }
@@ -2086,7 +2141,12 @@ function getIT0015Subtopic(q){
 }
 function getIT0035Subtopic(q){
   const stem = (q.q||'').toLowerCase();
-  const text = (q.q+' '+(q.ex||'')+' '+(q.opts||[]).join(' ')).toLowerCase();
+  const text = (q.q+' '+(q.ex||'')+' '+(q.opts||[]).join(' ')+' '+(q.moduleTitle||'')).toLowerCase();
+  if(/red hat|fedora|debian|ubuntu|mint|raspberry pi|android|distribution|release cycle|backward compatible|embedded|iot|artificial intelligence|beta software/.test(text)) return 'Topic: Linux Distributions & Platforms';
+  if(/shell|bash|c shell|bourne|korn|environment variable|path|ps1|quote|metacharacter|command line|text editor|vim|nano|pico|emacs|package manager|yum|apt|get/.test(text)) return 'Topic: Linux Shell, Editors & Packages';
+  if(/web server|nginx|apache|mail transfer|postfix|smtp|samba|nfs|dns|bind|server|share files|cloud computing/.test(text)) return 'Topic: Network Services & Cloud';
+  if(/password|keepass|firewall|unauthorized|cookies|strong password|security|protection|internal and external attacks/.test(text)) return 'Topic: Security & Safe Access';
+  if(/source code|open source|free software|fsf|stallman|gpl|lgpl|bsd|mit|apache|permissive|copyleft|floss|license|proprietary/.test(text)) return 'Topic: Open Source & Licensing';
   if(/operating system is what type of software|goals of os|example of system software/.test(stem)) return 'Topic: OS Fundamentals';
   if(/real[- ]?time|hand[- ]?held|distributed|network operating system|saas|paas|cloud/.test(text)) return 'Topic: OS Types & Cloud Models';
   if(/security|protection|internal and external attacks|open-source|source-code|copyleft|proprietary/.test(text)) return 'Topic: Security & Licensing';
@@ -2117,7 +2177,7 @@ function getNetworkingSubtopic(q){
 function parseIT0015Md(md,fileMeta,startId){
   const titleMatch = md.match(/^#\s+(.+)$/m);
   const title = titleMatch ? titleMatch[1].trim() : fileMeta.title;
-  const rawBlocks = md.split(/(?=^##\s+Q\d+\s*$)/m).filter(b=>/^##\s+Q\d+/m.test(b));
+  const rawBlocks = md.split(/(?=^##\s+Q\d+(?:\s+.*)?$)/m).filter(b=>/^##\s+Q\d+/m.test(b));
   const byNum = new Map();
   rawBlocks.forEach(block=>{
     const m = block.match(/^##\s+Q(\d+)/m);
@@ -2131,8 +2191,8 @@ function parseIT0015Md(md,fileMeta,startId){
     const rawType = readBankField(block,'Type').toLowerCase();
     const qText = readBankField(block,'Question');
     const explanation = readBankField(block,'Explanation') || 'No explanation provided.';
-    const opts = readBankList(block,'Options').map(cleanBankText).filter(o=>o && o.toUpperCase()!=='N/A');
-    const answerRaw = cleanBankText(readBankField(block,'Answer'));
+    const opts = (readBankList(block,'Options').length ? readBankList(block,'Options') : readBankList(block,'Options as provided')).map(cleanBankText).filter(o=>o && o.toUpperCase()!=='N/A');
+    const answerRaw = cleanBankText(readBankField(block,'Answer') || readBankField(block,'Reviewed Answer'));
     const q = {
       id:id++,
       src:fileMeta.src,
@@ -2143,6 +2203,14 @@ function parseIT0015Md(md,fileMeta,startId){
       file:fileMeta.file,
       sourceNum:num
     };
+    const visualType = readBankField(block,'Visual Type');
+    if(visualType){
+      q.exhibitType = visualType;
+      q.visualType = visualType;
+      q.cliContent = readBankField(block,'CLI Content');
+      q.exhibitDesc = readBankField(block,'Topology Recreation') || readBankField(block,'Visual Recreation Instructions');
+      q.hasExhibit = true;
+    }
     if(/^yes$/i.test(readBankField(block,'Has Exhibit'))){
       q.exhibitType = readBankField(block,'Exhibit Type') || 'Network exhibit';
       q.exhibitDesc = readBankField(block,'Exhibit / Topology Description');
@@ -2166,14 +2234,21 @@ function parseIT0015Md(md,fileMeta,startId){
       q.opts=opts;
       q.ans=optionIndexFromAnswer(opts,answerRaw);
     }
-    if(q.sourceNum===17){
+    if(fileMeta.topic==='Formative Assessment 1' && q.sourceNum===17){
       q.ans=optionIndexFromAnswer(q.opts,'False');
       q.answerLabel='Corrected Answer';
       q.ex += ' ⚠️ Corrected for the reviewer: VLAN 4095 is reserved, so the usable extended VLAN range is 1006-4094, not 1006-4095.';
     }
-    if(q.sourceNum===21){
+    if(fileMeta.topic==='Formative Assessment 1' && q.sourceNum===21){
       q.answerLabel='Course Answer';
       q.ex += ' ⚠️ Verify with your instructor/materials: DTP defaults vary by Catalyst platform and IOS behavior, so this broad statement can be course-version dependent.';
+    }
+    if(fileMeta.topic==='Formative Assessment 2' && q.sourceNum===9 && q.ans<0 && q.opts.length){
+      const corrected = 'The EtherChannel will fail.';
+      q.opts = [...q.opts, corrected];
+      q.ans = q.opts.length - 1;
+      q.answerLabel = 'Corrected Answer';
+      q.ex = 'EtherChannel member ports must have compatible Layer 2 settings, including the same access VLAN. If one member is in VLAN 22 and the others are in VLAN 11, the EtherChannel has a consistency problem and will not operate normally. ⚠️ The source choices omitted this expected Cisco answer, so this reviewer adds the missing technically correct option.';
     }
     if(q.opts && q.opts.length && q.ans>=0) questions.push(q);
   });
@@ -2182,6 +2257,7 @@ function parseIT0015Md(md,fileMeta,startId){
 
 function exhibitDeviceSvg(q){
   if(!q || !q.hasExhibit) return '';
+  if(q.visualType) return exhibitIT0015Visual(q);
   if(q.sourceNum===23 || q.sourceNum===34) return exhibitSwitchTriangle();
   if(q.sourceNum===36) return exhibitRouterOnStick();
   if(q.sourceNum===38) return exhibitTroubleshooting();
@@ -2189,6 +2265,16 @@ function exhibitDeviceSvg(q){
   return '';
 }
 function buildExhibit(q){
+  if(q && q.src==='NETWORKING' && (q.imageFile || q.exhibitDesc)){
+    const wrap=document.createElement('div');
+    wrap.className='exhibit-box';
+    let html=`<div class="exhibit-title">${esc(q.exhibitType||'Source Exhibit')}</div><div class="exhibit-content">`;
+    if(q.imageFile) html+=`<img class="exhibit-img" src="${esc(q.imageFile)}" alt="${esc(q.exhibitType||'Question exhibit')}">`;
+    if(q.exhibitDesc) html+=renderText(q.exhibitDesc);
+    html+='</div>';
+    wrap.innerHTML=html;
+    return wrap;
+  }
   const html = exhibitDeviceSvg(q);
   if(!html) return null;
   const wrap=document.createElement('div');
@@ -2255,6 +2341,41 @@ HQ(config)# interface s0/0/1
  ip address 209.165.200.120 255.255.255.0
  no shutdown</pre>`;
 }
+function stripFenceText(raw){
+  return String(raw||'').replace(/^```[^\n]*\n?/,'').replace(/\n?```$/,'').trim();
+}
+function exhibitIT0015Visual(q){
+  const cli = stripFenceText(q.cliContent);
+  const cliBox = cli ? `<pre class="cli-output">${esc(cli)}</pre>` : '';
+  if(q.sourceNum===28) return exhibitDHCPv6Relay(cliBox);
+  if(q.sourceNum===30) return exhibitDHCPv4Lan();
+  return cliBox;
+}
+function exhibitDHCPv6Relay(cliBox){
+  return `<div class="net-diagram"><svg class="net-svg" viewBox="0 0 760 390" role="img" aria-label="DHCPv6 relay topology with RTR1, two switches, PC-A, and DHCPv6 server">
+    <line class="net-line" x1="380" y1="92" x2="225" y2="165"/><line class="net-line" x1="380" y1="92" x2="535" y2="165"/>
+    <line class="net-line" x1="225" y1="223" x2="225" y2="300"/><line class="net-line" x1="535" y1="223" x2="535" y2="300"/>
+    <ellipse class="net-node router" cx="380" cy="62" rx="88" ry="34"/><text class="net-label" x="380" y="59" text-anchor="middle">RTR1</text><text class="net-small" x="380" y="78" text-anchor="middle">IPv6 router</text>
+    <rect class="net-node switch" x="150" y="165" width="150" height="58" rx="8"/><text class="net-label" x="225" y="193" text-anchor="middle">SW1</text><text class="net-small" x="225" y="211" text-anchor="middle">left LAN</text>
+    <rect class="net-node switch" x="460" y="165" width="150" height="58" rx="8"/><text class="net-label" x="535" y="193" text-anchor="middle">SW2</text><text class="net-small" x="535" y="211" text-anchor="middle">server LAN</text>
+    <rect class="net-node host" x="150" y="300" width="150" height="54" rx="6"/><text class="net-label" x="225" y="322" text-anchor="middle">PC-A</text><text class="net-small" x="225" y="341" text-anchor="middle">DHCPv6 client</text>
+    <rect class="net-node host" x="445" y="300" width="180" height="54" rx="6"/><text class="net-label" x="535" y="321" text-anchor="middle">DHCPv6 Server</text><text class="net-small" x="535" y="341" text-anchor="middle">2001:DB8:1234:ABCD::10/64</text>
+    <text class="net-small" x="250" y="124">RTR1 Fa0/0</text><text class="net-small" x="250" y="140">2001:DB8:1234:5678::1/64</text>
+    <text class="net-small" x="510" y="124">RTR1 Fa0/1</text><text class="net-small" x="510" y="140">2001:DB8:1234:ABCD::1/64</text>
+    <text class="net-note" x="225" y="374" text-anchor="middle">2001:DB8:1234:5678::/64</text>
+    <text class="net-note" x="535" y="374" text-anchor="middle">2001:DB8:1234:ABCD::/64</text>
+  </svg>${cliBox}</div>`;
+}
+function exhibitDHCPv4Lan(){
+  return `<div class="net-diagram"><svg class="net-svg" viewBox="0 0 760 320" role="img" aria-label="DHCP server, PC1, switch, and R1 on one IPv4 LAN">
+    <line class="net-line" x1="260" y1="104" x2="360" y2="170"/><line class="net-line" x1="250" y1="270" x2="360" y2="210"/><line class="net-line" x1="500" y1="190" x2="430" y2="190"/>
+    <rect class="net-node host" x="145" y="65" width="230" height="58" rx="6"/><text class="net-label" x="260" y="89" text-anchor="middle">DHCP Server</text><text class="net-small" x="260" y="108" text-anchor="middle">192.168.1.8/24</text>
+    <rect class="net-node switch" x="335" y="160" width="110" height="58" rx="8"/><text class="net-label" x="390" y="188" text-anchor="middle">Switch</text>
+    <rect class="net-node host" x="155" y="242" width="190" height="58" rx="6"/><text class="net-label" x="250" y="266" text-anchor="middle">PC1</text><text class="net-small" x="250" y="285" text-anchor="middle">192.168.1.130/24</text>
+    <ellipse class="net-node router" cx="575" cy="190" rx="78" ry="35"/><text class="net-label" x="575" y="184" text-anchor="middle">R1</text><text class="net-small" x="575" y="203" text-anchor="middle">Fa0/1 192.168.1.1/24</text>
+    <text class="net-note" x="390" y="35" text-anchor="middle">All devices shown on 192.168.1.0/24 LAN</text>
+  </svg></div>`;
+}
 
 function parseNetworkingMd(md,fileMeta,startId){
   const questions = [];
@@ -2270,45 +2391,57 @@ function parseNetworkingMd(md,fileMeta,startId){
       continue;
     }
     if(!/^##\s+Q\d+/m.test(block)) continue;
+    const qNumMatch = block.match(/^##\s+Q(\d+)/m);
+    const sourceNum = qNumMatch ? parseInt(qNumMatch[1],10) : null;
     const rawType = readBankField(block,'Type').toLowerCase();
     if(!rawType) continue;
-    const imageRequired = rawType.startsWith('image_') || /^yes$/i.test(readBankField(block,'Image Required'));
+    const imageFile = readBankImageFile(block);
+    const imagePath = imageFile ? fileMeta.file.replace(/[^/]+$/,'') + imageFile.replace(/^\.\//,'') : '';
+    const imageRequired = rawType.startsWith('image_') || /^yes$/i.test(readBankField(block,'Image Required')) || !!imageFile;
     const baseType = rawType.replace(/^image_/,'');
     let qText = readBankField(block,'Question');
-    if(imageRequired) qText += '\n\n[Image/exhibit referenced in the source question.]';
     const explanation = readBankField(block,'Explanation') || 'No explanation provided.';
+    const flag = readBankField(block,'⚠ Flag');
+    const exhibitDesc = readBankField(block,'Exhibit (exact description of the image / diagram / command output)');
+    const answerRaw = readBankField(block,'Answer');
+    const preparedAnswer = prepareBankAnswer(answerRaw);
     const q = {
       id:id++,
       src:fileMeta.src,
       topic:currentSection,
       q:qText,
       ex:explanation,
+      flag,
       moduleTitle:currentSection,
       file:fileMeta.file,
       imageRequired,
-      answerLabel:networkingAnswerLabel(explanation)
+      imageFile:imagePath,
+      exhibitType:imageRequired?'Source Exhibit':'',
+      exhibitDesc,
+      answerLabel:preparedAnswer.suggested?'Suggested Answer, Not From Source':networkingAnswerLabel(explanation)
     };
+    q.sourceNum = sourceNum;
     const opts = readBankList(block,'Options').map(cleanBankText);
     const answerLines = readBankList(block,'Answer').map(cleanBankText);
-    const answerRaw = readBankField(block,'Answer');
     if(baseType==='single'){
       q.type='mc';
       q.opts=opts;
-      q.ans=optionIndexFromAnswer(opts, answerRaw);
+      q.ans=optionIndexFromAnswer(opts, preparedAnswer.text);
     } else if(baseType==='multiple'){
       q.type='checkbox';
       q.opts=opts;
-      const answers = answerLines.length ? answerLines : bankAnswerTokens(answerRaw);
+      const answers = answerLines.length ? answerLines : bankAnswerTokens(preparedAnswer.text);
       q.ans=answers.map(a=>optionIndexFromAnswer(opts,a)).filter(i=>i>=0);
     } else if(baseType==='true_false'){
       q.type='tf-grid';
       const statements = (readBankList(block,'Statements').length ? readBankList(block,'Statements') : opts).map(cleanBankText);
-      const answerMap = new Map(bankTrueFalseAnswers(answerRaw).map(a=>[a.idx,a.ans]));
+      const answerMap = new Map(bankTrueFalseAnswers(preparedAnswer.text).map(a=>[a.idx,a.ans]));
       const answers = answerLines.map(line=>/(?:→|->|—|-|:)\s*(true|yes)$/i.test(line));
       q.rows = statements.map((label,i)=>({label, ans:answerMap.has(i) ? answerMap.get(i) : answers[i]===true}));
     } else if(baseType==='matching'){
       q.type='match';
-      const pairLines = answerLines.length ? answerLines : bankAnswerSegments(answerRaw);
+      const tablePairs = readBankTablePairs(block,'Answer (pairs)');
+      const pairLines = tablePairs.length ? tablePairs.map(p=>p.item+' → '+p.target) : answerLines.length ? answerLines : bankAnswerSegments(preparedAnswer.text);
       q.pairs = pairLines.map((line,idx)=>{
         const parts = line.split(/\s+→\s+/);
         return {id:'p'+idx, term:cleanBankText(parts.slice(0,-1).join(' → ')), desc:cleanBankText(parts[parts.length-1])};
@@ -2317,15 +2450,17 @@ function parseNetworkingMd(md,fileMeta,startId){
       q.slots = q.pairs.length;
       q.ans = q.pairs.map(p=>p.id);
     } else if(baseType==='command'){
-      const correct = cleanBankText(answerRaw);
-      const choices = commandChoices(correct,q.id);
-      q.type='mc';
-      q.opts=choices.opts;
-      q.ans=choices.ans;
+      const correct = cleanBankText(preparedAnswer.text);
+      q.type='command';
+      q.answer=correct;
+      q.accept=[correct];
+      if(correct==='tcp.port == 7100') q.accept.push('tcp.port eq 7100');
+      q.selfCheck = sourceNum===62 || /IP address\s+—/i.test(correct);
     }
     const ok = q.type==='match' ? q.pairs && q.pairs.length :
       q.type==='checkbox' ? q.opts && q.opts.length && q.ans && q.ans.length :
       q.type==='tf-grid' ? q.rows && q.rows.length :
+      q.type==='command' ? q.answer :
       q.type==='mc' ? q.opts && q.opts.length && q.ans>=0 : false;
     if(ok) questions.push(q);
   }
@@ -2370,12 +2505,14 @@ async function loadMarkdownData(){
           Q.push(...parsed);
           nextId += parsed.length;
         } else {
-          const moduleTitle = parsed[0].moduleTitle;
-          parsed.forEach(q => q.topic = moduleTitle);
+          const moduleTitles = [...new Set(parsed.map(q=>q.moduleTitle))];
+          parsed.forEach(q => q.topic = q.moduleTitle);
           Q.push(...parsed);
-          TOPIC_GROUPS[fileMeta.src][moduleTitle] = parsed.map(q=>q.id);
+          moduleTitles.forEach(moduleTitle=>{
+            TOPIC_GROUPS[fileMeta.src][moduleTitle] = parsed.filter(q=>q.moduleTitle===moduleTitle).map(q=>q.id);
+            loaded.push(moduleTitle);
+          });
           nextId += parsed.length;
-          loaded.push(moduleTitle);
         }
       }
     }catch(e){
@@ -2447,7 +2584,7 @@ function buildTopicGrid(src){
       if(!before || (isSubtopic && !prevWasSubtopic)){
         const div = document.createElement('div');
         div.className = 'topic-divider';
-        const firstLabel = src==='NETWORKING' ? 'Question Bank Sections' : 'Formative Assessments';
+        const firstLabel = src==='NETWORKING' ? 'Question Bank Sections' : src==='IT0035' ? 'Exam Sources' : 'Formative Assessments';
         div.textContent = isSubtopic ? 'Specific Topic Filters' : firstLabel;
         grid.appendChild(div);
       }
@@ -2731,8 +2868,8 @@ function renderQ(){
   $('q-fb').innerHTML='';
   $('btn-skip').style.display='';
   $('btn-next').style.display='none';
-  const typeNames={mc:'Multiple Choice',checkbox:'Choose Multiple','tf-grid':'True / False','dd-grid':'Drop-Down','code-dd':'Code Drop-Down','token-drag':'Drag & Drop','drag-order':'Arrange in Order','match':'Match'};
-  const typeClasses={mc:'ql-mc',checkbox:'ql-cb','tf-grid':'ql-tf','dd-grid':'ql-dd','code-dd':'ql-dd','token-drag':'ql-drag','drag-order':'ql-drag','match':'ql-drag'};
+  const typeNames={mc:'Multiple Choice',checkbox:'Choose Multiple','tf-grid':'True / False','dd-grid':'Drop-Down','code-dd':'Code Drop-Down','token-drag':'Drag & Drop','drag-order':'Arrange in Order','match':'Match',command:'Command'};
+  const typeClasses={mc:'ql-mc',checkbox:'ql-cb','tf-grid':'ql-tf','dd-grid':'ql-dd','code-dd':'ql-dd','token-drag':'ql-drag','drag-order':'ql-drag','match':'ql-drag',command:'ql-dd'};
   const tb=$('q-type');
   tb.textContent=typeNames[q.type]||q.type;
   tb.className='qtype-lbl '+(typeClasses[q.type]||'');
@@ -2742,7 +2879,7 @@ function renderQ(){
   const exhibit=buildExhibit(q);
   if(exhibit) body.appendChild(exhibit);
   body.appendChild(buildBody(q));
-  const hints={checkbox:`Select ${q.ans?q.ans.length:'?'} correct answers, then Submit`,'tf-grid':'Select Yes/True or No/False for each statement, then Submit','dd-grid':'Select an answer from each drop-down, then Submit','code-dd':'Select an answer from each inline drop-down, then Submit','token-drag':'Drag tokens into the slots, then Submit','drag-order':'Drag items into the correct order, then Submit',mc:'Click your answer'};
+  const hints={checkbox:`Select ${q.ans?q.ans.length:'?'} correct answers, then Submit`,'tf-grid':'Select Yes/True or No/False for each statement, then Submit','dd-grid':'Select an answer from each drop-down, then Submit','code-dd':'Select an answer from each inline drop-down, then Submit','token-drag':'Drag tokens into the slots, then Submit','drag-order':'Drag items into the correct order, then Submit',command:'Type the answer, then Submit',mc:'Click your answer'};
   $('q-hint').textContent=hints[q.type]||'';
   // Update flag button state
   const fb2=$('btn-flag');
@@ -2764,7 +2901,50 @@ function buildBody(q){
   else if(q.type==='token-drag') wrap.appendChild(buildTokenDrag(q));
   else if(q.type==='drag-order') wrap.appendChild(buildDragOrder(q));
   else if(q.type==='match') wrap.appendChild(buildMatch(q));
+  else if(q.type==='command') wrap.appendChild(buildCommand(q));
   return wrap;
+}
+
+function normalizeCommandAnswer(s){
+  return String(s||'').toLowerCase().trim()
+    .replace(/\s+/g,' ')
+    .replace(/\s*(==|=)\s*/g,' == ')
+    .replace(/\s+eq\s+/g,' == ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function buildCommand(q){
+  const d=document.createElement('div');
+  d.className='command-wrap';
+  const input=document.createElement('input');
+  input.className='command-input';
+  input.type='text';
+  input.placeholder=q.selfCheck?'Enter your answer, then compare with the suggested answer':'Type the command or value';
+  input.addEventListener('keydown',e=>{if(e.key==='Enter') submitCommand(q,input,sub);});
+  const btnRow=document.createElement('div');
+  btnRow.className='btn-row';
+  const sub=document.createElement('button');
+  sub.className='btn-sub';
+  sub.textContent=q.selfCheck?'Show Self-Check':'Submit';
+  sub.onclick=()=>submitCommand(q,input,sub);
+  btnRow.appendChild(sub);
+  d.appendChild(input);
+  d.appendChild(btnRow);
+  return d;
+}
+function submitCommand(q,input,btn){
+  const chosen=input.value;
+  const accepted=(q.accept||[q.answer]).map(normalizeCommandAnswer);
+  const correct=q.selfCheck ? true : accepted.includes(normalizeCommandAnswer(chosen));
+  input.disabled=true;
+  btn.disabled=true;
+  input.classList.add(correct?'ok':'err');
+  showFB(q.selfCheck?'partial':correct?'ok':'err',correct,q.ex,q,correct?null:[q.answer]);
+  if(correct && !q.selfCheck) session.score++;
+  if(!correct) session.wrong.push(q.id);
+  session.log.push({id:q.id,correct,partial:q.selfCheck,chosen:[chosen]});
+  recordTopicStat(q,correct);
+  showNext();
 }
 
 function buildMC(q){
@@ -3291,6 +3471,7 @@ function buildAnswerPreview(q){
   if(q.type==='token-drag') return buildTokenPreview(q);
   if(q.type==='drag-order') return buildDragPreview(q);
   if(q.type==='match') return buildMatchPreview(q);
+  if(q.type==='command') return `<div class="fb-drag-slot"><span class="fb-drag-num">✓</span><span class="fb-drag-label">${esc(q.answer||'')}</span></div>`;
   return '';
 }
 
@@ -3628,6 +3809,8 @@ function buildReview(){
         ansHtml=`<div class="rev-ans rev-ok">✓ ${esc(q.answerLabel||'Correct')}: ${q.ans.map(i=>q.opts[i]).join(', ')}</div>`;
       } else if(q.type==='match'&&q.pairs){
         ansHtml=`<div class="rev-ans rev-ok">✓ ${esc(q.answerLabel||'Correct')}: ${q.pairs.map(p=>p.term+' → '+p.desc).join(' | ')}</div>`;
+      } else if(q.type==='command'){
+        ansHtml=`<div class="rev-ans rev-ok">✓ ${esc(q.answerLabel||'Correct')}: ${esc(q.answer||'')}</div>`;
       }
       const caution = sourceCautionText(q);
       if(caution) ansHtml+=`<div class="rev-ans rev-warn">${esc(caution)}</div>`;

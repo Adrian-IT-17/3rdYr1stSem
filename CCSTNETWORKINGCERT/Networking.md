@@ -1,19 +1,61 @@
-# CCST Networking Reviewer — Full Question Extraction
+# CCST Networking Reviewer — Question Bank (86 questions)
 
-> **Notes on conventions used in this extraction:**
-> - The source PDF does not number its questions, so questions are numbered sequentially (Q1–Q86) in the order they appear in the PDF.
-> - All question text, options, spelling, capitalization, punctuation, and typos are preserved EXACTLY as written in the PDF, even where incorrect or garbled.
-> - Where the PDF text is truncated/cut off, this is marked with `[cut off in PDF]`.
-> - Where the reviewer's indicated answer differs from (or is questionable against) the logically correct answer, the Explanation explicitly flags it.
-> - Duplicate questions are kept, as instructed.
+> **Source:** `CCST_Networking_Reviewer.pdf` (99 slides, exported from PowerPoint). Questions are not numbered in the PDF, so they are numbered Q1–Q86 in PDF order. Duplicates are intentionally kept.
+>
+> **Fidelity rules used in this file**
+> - Question and option wording follows the PDF word for word. Only grammar, spacing, capitalization, and punctuation were cleaned (for example "IPv6address" → "IPv6 address", "OS2LC" → "OS2 LC", stray spaces inside IPv6 addresses removed).
+> - **`Answer` is always the reviewer's answer** as highlighted or written in the PDF, even when it is technically wrong. When a reviewer answer looks wrong, a **`⚠ Flag`** explains what is actually correct. Do not silently replace the reviewer's key; show the flag to the learner.
+> - Where the PDF slide shows **no answer** at all (Q62, Q76–Q79, Q82), the answer is labeled **"NO ANSWER SHOWN IN THE PDF"** and a suggested answer is given.
+> - Every question that has a picture, topology, or command output has an **`Exhibit`** section that transcribes it exactly. Where an extracted image file exists, it is named in `Image file` (found in the `exhibits/` folder alongside this file). Q52's picture is missing from the PDF itself (flagged).
+
+## How to use this file (for Codex / app generation)
+
+Each question uses this structure:
+
+```
+## Q<n>
+- PDF page: <slide number>
+- Type: single | multiple | matching | true_false | command | image_single | image_multiple | image_matching | image_true_false | image_command
+Question / Exhibit / Options (or Pairs, or Statements) / Answer / Explanation / Flag
+```
+
+- `single` = one correct option; `multiple` = "Choose 2" style (select all correct).
+- `matching` = drag items on the left to targets on the right; the **Pairs** table is the answer key. Left items may be reused (see the question note).
+- `true_false` = each statement is graded True/False separately; the answer line gives all of them in order.
+- `command` / `image_command` = free-text answer (accept case-insensitive, trimmed matches and obvious equivalents).
+- Build visual exhibits (topologies, CLI output) from the `Exhibit` text, or display the provided image file when available.
+
+## Flag summary (questions where the reviewer's answer or the source needs attention)
+
+| Q | Issue |
+|---|-------|
+| Q1 | Reviewer marks /20; correct is /22 (mask 255.255.252.0). |
+| Q14 | NIC grouped at Physical layer (usually Data Link). |
+| Q22 | Reviewer marks TFTP for SLAAC; correct is ICMPv6. |
+| Q31 | OSPF options garbled; reviewer marks "Llo (Link-Local Operations)"; real answer is IP protocol 89, not offered. |
+| Q35 | SNMP keyed; SSH/Telnet is the real-world answer (not offered). |
+| Q45 | Two pairings swapped (WPS vs SSID broadcasting). |
+| Q52 | The image is missing from the PDF; exhibit reconstructed. |
+| Q66 | Reviewer marks A and D; D is doubtful, C is clearly true. |
+| Q62, Q76, Q77, Q78, Q79, Q82 | No answer shown in the PDF; suggested answers given. |
+| Q75 | Only statement 1 is marked; 2 and 3 are unmarked (False). |
+| Q15, Q18, Q19, Q20, Q43, Q44, Q57, Q80, Q84 | Typos or truncations in the PDF, noted in each question. |
 
 ---
 
+# Section 1 — Standard Concepts
+
+*PDF pages 5–39 (Q1–Q35)*
+
+
 ## Q1
 
-**Question:** How is given the IP Address 172.16.199.25and the subnet mask 255.255.252.0.What is the CIDR notation for this address?
+- **PDF page:** 5
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Given the IP address 172.16.199.25 and the subnet mask 255.255.252.0, what is the CIDR notation for this address?  
 
 **Options:**
 
@@ -22,17 +64,24 @@
 - C. 172.16.100.25/23
 - D. 172.16.100.25/20
 
-**Answer:** A. 172.16.100.25/22
+**Answer:** D. 172.16.100.25/20
 
-**Explanation:** The subnet mask 255.255.252.0 has 22 consecutive 1-bits (255.255.11111100.0), so the CIDR notation is /22. ⚠️ Note: The question text says the IP address is 172.16.199.25, but ALL four options say 172.16.100.25 — this inconsistency exists in the PDF itself and was preserved. The correct prefix length is /22 regardless of which host address is used.
+**Explanation:** This is what the reviewer highlighted in the PDF.
+
+**⚠ Flag:** QUESTIONABLE ANSWER. The mask 255.255.252.0 has 22 consecutive 1-bits (255.255.11111100.0), so the correct CIDR prefix is /22, which is option A. The reviewer highlights D (/20), which contradicts Q4 (same mask, where the reviewer correctly highlights /22). Also, the question says 172.16.199.25 but every option says 172.16.100.25 (an inconsistency in the PDF itself). Keep D as the reviewer's key; show the flag so the learner knows /22 is correct.
 
 ---
 
 ## Q2
 
-**Question:** How is the following IP address written when using a CIDR notation? IP Address:192.168.0.16Subnet Mask: `[cut off in PDF]`
+- **PDF page:** 6
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> How is the following IP address written when using CIDR notation?  
+> IP Address: 192.168.0.16  
+> Subnet Mask: 255.255.255.240  
 
 **Options:**
 
@@ -43,15 +92,18 @@
 
 **Answer:** C. 192.168.0.16/28
 
-**Explanation:** ⚠️ The subnet mask value itself is cut off in the PDF. The original version of this exam question uses subnet mask 255.255.255.240, which equals /28, making C the answer. (/30, /15, and /24 do not correspond to any common mask that would make a different option uniquely correct.)
+**Explanation:** 255.255.255.240 has 28 consecutive 1-bits (24 + 4), so the prefix is /28.
 
 ---
 
 ## Q3
 
-**Question:** What is the CIDR prefix notation for a subnet mask of `[cut off in PDF]`
+- **PDF page:** 7
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> What is the CIDR prefix notation for a subnet mask of 255.255.0.0?  
 
 **Options:**
 
@@ -62,15 +114,18 @@
 
 **Answer:** C. /16
 
-**Explanation:** ⚠️ The subnet mask is cut off in the PDF, so this answer is inferred from the original circulating version of this question, which uses the mask 255.255.0.0 — that mask has 16 network bits, so its CIDR prefix notation is /16. (Option D is also written without a "/" in the PDF — preserved as-is.)
+**Explanation:** 255.255.0.0 has 16 network bits, so the prefix is /16. (Option D is printed as "32" without a slash in the PDF.)
 
 ---
 
 ## Q4
 
-**Question:** A host is given the IP address 172.16.100.25and the subnet mask `[cut off in PDF]`
+- **PDF page:** 8
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A host is given the IP address 172.16.100.25 and the subnet mask 255.255.252.0. Which CIDR notation is correct?  
 
 **Options:**
 
@@ -81,15 +136,18 @@
 
 **Answer:** D. 172.16.100.25/22
 
-**Explanation:** ⚠️ The subnet mask is cut off in the PDF, but this is the same question as Q1 (see Q1, where the mask 255.255.252.0 is shown). The mask 255.255.252.0 equals /22, so the correct CIDR notation is 172.16.100.25/22.
+**Explanation:** 255.255.252.0 = /22. The PDF prints no explicit question sentence after the mask; the options make clear the question asks for the CIDR notation (same as Q1).
 
 ---
 
 ## Q5
 
-**Question:** Which address is included in the 192.168.200.0/24network?
+- **PDF page:** 9
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which address is included in the 192.168.200.0/24 network?  
 
 **Options:**
 
@@ -100,15 +158,18 @@
 
 **Answer:** B. 192.168.200.13
 
-**Explanation:** The network 192.168.200.0/24 covers host addresses from 192.168.200.1 to 192.168.200.254. Only 192.168.200.13 falls inside that range.
+**Explanation:** 192.168.200.0/24 covers 192.168.200.0 to 192.168.200.255 (usable hosts .1 to .254). Only 192.168.200.13 is inside it.
 
 ---
 
 ## Q6
 
-**Question:** What is the most compressed valid format of the IPv6address 2001:0db8:0000:0016:0000:001b:2000:0056?
+- **PDF page:** 10
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> What is the most compressed valid format of the IPv6 address 2001:0db8:0000:0016:0000:001b:2000:0056?  
 
 **Options:**
 
@@ -119,34 +180,43 @@
 
 **Answer:** D. 2001:db8:0:16::1b:2000:56
 
-**Explanation:** IPv6 compression rules allow only ONE "::" per address (which eliminates options A and B immediately), and leading zeros may only be dropped within a group — 2000 must stay 2000 (it cannot become 2), and 0056 becomes 56. Option C wrongly rewrites 2000 as 2. Option D correctly drops leading zeros (0db8→db8, 0000→0, 0016→16, 001b→1b, 0056→56) and uses a single "::" for the remaining zero group.
+**Explanation:** Only one "::" is allowed per address (eliminates A and B). Leading zeros may be dropped within a group, but 2000 must stay 2000 (eliminates C). In D: 0db8→db8, 0000→0, 0016→16, 0000→"::", 001b→1b, 2000, 0056→56.
+
+**⚠ Flag:** NOTE: The PDF prints option D with stray spaces ("2001:db8: 0:16: :1b: 2000:56"). Spacing is normalized here.
 
 ---
 
 ## Q7
 
-**Question:** Which address is included in the 192.168.200.0/24network?
+- **PDF page:** 11
+- **Type:** single
+- **Duplicate of:** Q5
 
-**Type:** single
+**Question:**
+
+> Which address is included in the 192.168.200.0/24 network?  
 
 **Options:**
 
 - A. 192.168.200.13
-- B. 192.168.201.13 (the PDF prints this option label as "3." — preserved note)
+- B. 192.168.201.13
 - C. 192.168.1.13
 - D. 192.168.199.13
 
 **Answer:** A. 192.168.200.13
 
-**Explanation:** Duplicate of Q5 with the options in a different order. The 192.168.200.0/24 network only contains addresses in the range 192.168.200.1 – 192.168.200.254, so 192.168.200.13 is the only valid choice. ⚠️ In the PDF the second option is mislabeled "3." instead of "B." — this typo was preserved.
+**Explanation:** Duplicate of Q5 with the options in a different order.
 
 ---
 
 ## Q8
 
-**Question:** Which address is a link-local IPV6address?
+- **PDF page:** 12
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which address is a link-local IPv6 address?  
 
 **Options:**
 
@@ -157,15 +227,18 @@
 
 **Answer:** B. FE80::261:2EFE:FE10:765
 
-**Explanation:** IPv6 link-local addresses always begin with FE80::/10. The other addresses are a ULA (FDF8...), a global unicast (2001:0db8...), and a global unicast (2401:db00...).
+**Explanation:** IPv6 link-local addresses are in FE80::/10. A is a unique local address (ULA); C and D are global unicast.
 
 ---
 
 ## Q9
 
-**Question:** At which OSI layer is the data stream broken up into segments that include source and destination port numbers?
+- **PDF page:** 13
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> At which OSI layer is the data stream broken up into segments that include source and destination port numbers?  
 
 **Options:**
 
@@ -176,34 +249,40 @@
 
 **Answer:** C. Transport
 
-**Explanation:** The Transport layer (Layer 4) segments the data stream and adds a header containing source and destination port numbers (TCP or UDP).
+**Explanation:** The Transport layer (Layer 4) segments data and adds source and destination port numbers (TCP or UDP).
 
 ---
 
 ## Q10
 
-**Question:** Which information is included in the header of UDP segment?
+- **PDF page:** 14
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which information is included in the header of a UDP segment?  
 
 **Options:**
 
 - A. Port Numbers
 - B. IP Address
 - C. Sequence Numbers
-- D. Mac Address
+- D. MAC Address
 
 **Answer:** A. Port Numbers
 
-**Explanation:** A UDP segment header contains only source port, destination port, length, and checksum. IP addresses belong to the Layer 3 header, MAC addresses to the Layer 2 header, and UDP has no sequence numbers (that is a TCP feature).
+**Explanation:** A UDP header holds source port, destination port, length, and checksum. IP addresses are Layer 3, MAC addresses Layer 2, and sequence numbers are a TCP feature.
 
 ---
 
 ## Q11
 
-**Question:** During the data encapsulation process which OSI layer adds a header that contains MAC addressing information and a trailer used for error `[checking]`
+- **PDF page:** 15
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> During the data encapsulation process, which OSI layer adds a header that contains MAC addressing information and a trailer used for error checking?  
 
 **Options:**
 
@@ -214,15 +293,18 @@
 
 **Answer:** D. Data Link
 
-**Explanation:** The Data Link layer (Layer 2) builds frames: it adds a header with source and destination MAC addresses and a trailer containing a Frame Check Sequence (FCS) used for error detection.
+**Explanation:** The Data Link layer (Layer 2) builds frames: a header with source and destination MAC addresses and a trailer with the Frame Check Sequence (FCS) for error detection.
 
 ---
 
 ## Q12
 
-**Question:** Which protocol allows you to securely upload files to another computer on the internet?
+- **PDF page:** 16
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which protocol allows you to securely upload files to another computer on the internet?  
 
 **Options:**
 
@@ -233,17 +315,20 @@
 
 **Answer:** A. SFTP
 
-**Explanation:** SFTP (Secure File Transfer Protocol / SSH File Transfer Protocol) encrypts file transfers over an SSH connection on TCP port 22. HTTP is unencrypted, NTP is for time synchronization, and ICMP is for diagnostics.
+**Explanation:** SFTP transfers files over an SSH connection (TCP port 22). HTTP is unencrypted, NTP is time sync, ICMP is diagnostics.
 
 ---
 
 ## Q13
 
-**Question:** Move each of the protocol on the left to its their characteristics on the right
+- **PDF page:** 17
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (protocols):**
+> Move each of the protocols on the left to its characteristics on the right.  
+
+**Items (left):**
 
 - SFTP
 - TFTP
@@ -251,29 +336,46 @@
 - DHCP
 - ICMP
 
-**Match To (characteristics):**
+**Targets (right):**
 
-- Enables the use of SSH keys to prevent impostor from connecting to the server.
-- Ensures data integrity and data security for the file transfers using port 22.
+- Enables the use of SSH keys to prevent an impostor from connecting to the server.
+- Ensures data integrity and data security for file transfers using port 22.
 - Enables backup of network and router configuration files using UDP.
-- Transfer small files within a LAN using port 69.
-- Perform a query to translate companypro.net to an IP Address.
-- Assign the reserved IP Address 10.10.10.200 to a web server at your company.
-- Perform a ping to ensure that a server is responding to network connections.
+- Transfers small files within a LAN using port 69.
+- Performs a query to translate companypro.net to an IP address.
+- Assigns the reserved IP address 10.10.10.200 to a web server at your company.
+- Performs a ping to ensure that a server is responding to network connections.
 
-**Answer:** SFTP → Enables the use of SSH keys to prevent impostor from connecting to the server; SFTP → Ensures data integrity and data security for the file transfers using port 22; TFTP → Enables backup of network and router configuration files using UDP; TFTP → Transfer small files within a LAN using port 69; DNS → Perform a query to translate companypro.net to an IP Address; DHCP → Assign the reserved IP Address 10.10.10.200 to a web server at your company; ICMP → Perform a ping to ensure that a server is responding to network connections.
+**Answer (pairs):**
 
-**Explanation:** SFTP runs over SSH (port 22) and supports SSH-key authentication. TFTP uses UDP port 69 and is commonly used for transferring configuration files and small files within a LAN. DNS resolves names to IP addresses; DHCP assigns IP addresses (including reserved/reservation addresses); ICMP is the protocol used by ping.
+| Item | Target |
+|---|---|
+| SFTP | Enables the use of SSH keys to prevent an impostor from connecting to the server. |
+| SFTP | Ensures data integrity and data security for file transfers using port 22. |
+| TFTP | Enables backup of network and router configuration files using UDP. |
+| TFTP | Transfers small files within a LAN using port 69. |
+| DNS | Performs a query to translate companypro.net to an IP address. |
+| DHCP | Assigns the reserved IP address 10.10.10.200 to a web server at your company. |
+| ICMP | Performs a ping to ensure that a server is responding to network connections. |
+
+**Explanation:** Each protocol on the left can be used more than once: SFTP (SSH, port 22) matches two items, TFTP (UDP port 69) matches two items, and DNS, DHCP, ICMP match one each.
 
 ---
 
 ## Q14
 
-**Question:** Move each protocol or device type from the list on the left to the correct OSI layer on the right.
+- **PDF page:** 18
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (protocols and devices):**
+> Move each protocol or device type from the list on the left to the correct OSI layer on the right.  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+Slide layout: the five OSI layers (Physical, Data Link, Network, Application, Transport) are listed in a left column as drag targets. The five items (SMTP, FTP / TCP, UDP / Cable, Hub, NIC / Switch / Router) are shown color-highlighted on the right, each with the reviewer's answer written beside it: Application, transport, Physical, data link, network.  
+
+**Items (left):**
 
 - SMTP, FTP
 - TCP, UDP
@@ -281,7 +383,7 @@
 - Switch
 - Router
 
-**Match To (OSI layers):**
+**Targets (right):**
 
 - Physical
 - Data Link
@@ -289,67 +391,101 @@
 - Application
 - Transport
 
-**Answer:** SMTP, FTP → Application; TCP, UDP → Transport; Cable, Hub, NIC → Physical (as shown in the reviewer image); Switch → Data Link; Router → Network.
+**Answer (pairs):**
 
-**Explanation:** Application-layer protocols include SMTP and FTP; TCP and UDP are Transport-layer protocols; a switch operates at Layer 2 (Data Link) and a router at Layer 3 (Network). ⚠️ Note: The reviewer places the NIC at the Physical layer together with cable and hub. This is questionable — a NIC is generally considered to operate at Layer 2 (Data Link) as well as Layer 1, and most CCNA/CCST curricula classify the NIC at the Data Link layer. The reviewer's grouping was preserved as shown.
+| Item | Target |
+|---|---|
+| SMTP, FTP | Application |
+| TCP, UDP | Transport |
+| Cable, Hub, NIC | Physical |
+| Switch | Data Link |
+| Router | Network |
+
+**Explanation:** SMTP/FTP are Application layer; TCP/UDP are Transport; a switch is Data Link (Layer 2); a router is Network (Layer 3).
+
+**⚠ Flag:** QUESTIONABLE ANSWER. The reviewer groups the NIC with Cable and Hub at the Physical layer. A NIC operates at Layer 1 and Layer 2 and is usually taught at the Data Link layer (it has the MAC address). Keep the reviewer's grouping as the key and show this flag.
 
 ---
 
 ## Q15
 
-**Question:** Move each protocol from the list on the left to the correct TCP/IP model layer on the right.
+- **PDF page:** 19
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (protocols):**
+> Move each protocol from the list on the left to the correct TCP/IP model layer on the right.  
+
+**Items (left):**
 
 - TCP
 - IP
 - FTP
 - Ethernet
 
-**Match To (TCP/IP model layers):**
+**Targets (right):**
 
 - Internetwork
 - Application
 - Transport
 - Network
 
-**Answer:** TCP → Transport; IP → Internetwork; FTP → Application; Ethernet → Network (as labeled in the reviewer).
+**Answer (pairs):**
 
-**Explanation:** In the TCP/IP model, TCP is the Transport layer protocol, IP is the Internetwork layer protocol, and FTP is an Application layer protocol. Ethernet maps to the bottom (network access/link) layer. ⚠️ Note: The TCP/IP model's bottom layer is properly called "Network Access" (or Link); the reviewer labels it "Network," which is preserved as shown.
+| Item | Target |
+|---|---|
+| TCP | Transport |
+| IP | Internetwork |
+| FTP | Application |
+| Ethernet | Network |
+
+**Explanation:** TCP = Transport, IP = Internetwork, FTP = Application, Ethernet = bottom layer.
+
+**⚠ Flag:** NOTE: The TCP/IP model's bottom layer is normally called "Network Access" (or "Link"). The reviewer labels it "Network". Keep the reviewer's label.
 
 ---
 
 ## Q16
 
-**Question:** Move each category on the left to its correct definition on the right
+- **PDF page:** 20
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (categories):**
+> Move each category on the left to its correct definition on the right.  
+
+**Items (left):**
 
 - LAN
 - PAN
 - WAN
 
-**Match To (definitions):**
+**Targets (right):**
 
-- Connects devices such as computers, telephones, tables, and printers within a range of about 10 meters.
-- Spans a small area such as a room, home, office building or small group of building.
-- Spans a large geographical distance and connects smaller networks over leased lines and VPN's or tunnels.
+- Connects devices such as computers, telephones, tablets, and printers within a range of about 10 meters.
+- Spans a small area such as a room, home, office building, or small group of buildings.
+- Spans a large geographical distance and connects smaller networks over leased lines and VPNs or tunnels.
 
-**Answer:** PAN → Connects devices such as computers, telephones, tables, and printers within a range of about 10 meters; LAN → Spans a small area such as a room, home, office building or small group of building; WAN → Spans a large geographical distance and connects smaller networks over leased lines and VPN's or tunnels.
+**Answer (pairs):**
 
-**Explanation:** A PAN (Personal Area Network, e.g., Bluetooth) covers roughly 10 meters; a LAN covers a small site such as a home or office building; a WAN spans large geographic distances, often over leased lines or VPN tunnels.
+| Item | Target |
+|---|---|
+| PAN | Connects devices such as computers, telephones, tablets, and printers within a range of about 10 meters. |
+| LAN | Spans a small area such as a room, home, office building, or small group of buildings. |
+| WAN | Spans a large geographical distance and connects smaller networks over leased lines and VPNs or tunnels. |
+
+**Explanation:** PAN ≈ 10 meters (for example Bluetooth); LAN = small site; WAN = large geographic distance.
 
 ---
 
 ## Q17
 
-**Question:** Which command will display all the current operational settings configured on a Cisco router?
+- **PDF page:** 21
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which command will display all the current operational settings configured on a Cisco router?  
 
 **Options:**
 
@@ -360,81 +496,111 @@
 
 **Answer:** D. show running-config
 
-**Explanation:** The show running-config command displays the currently active (operational) configuration in RAM. show startup-config shows the saved configuration in NVRAM (which only matches the running config if it has been saved), and show version shows hardware/software information.
+**Explanation:** show running-config displays the active configuration in RAM. show startup-config shows the saved configuration in NVRAM; show version shows hardware/software information.
 
 ---
 
 ## Q18
 
-**Question:** For each statement about bandwidth and throughput. Select True or False
+- **PDF page:** 22
+- **Type:** true_false
 
-**Type:** true_false
+**Question:**
 
-**Options:**
+> For each statement about bandwidth and throughput, select True or False.  
 
-- High levels of network latency decreases network `[cut off in PDF — presumably "throughput"]`
-- Low Bandwidth can increase network `[cut off in PDF]`
-- You can increase throughput by decreasing network `[cut off in PDF — presumably "latency"]`
+**Statements:**
 
-**Answer:** Statement 1 — True; Statement 2 — True (inferred); Statement 3 — True (inferred).
+- 1. High levels of network latency decreases network bandwidth.
+- 2. Low bandwidth can increase network latency.
+- 3. You can increase throughput by decreasing network [word missing in PDF].
 
-**Explanation:** ⚠️ All three statements are cut off at the end in the PDF, so the answers are inferred from the visible fragments and standard networking knowledge: (1) High latency reduces effective throughput — True; (2) Low bandwidth can increase network delay/congestion — True; (3) Decreasing latency improves throughput — True. Verify against a complete copy of the reviewer if available.
+**Answer:** 1 — False; 2 — True; 3 — True
+
+**Explanation:** (1) Latency does not change bandwidth (bandwidth is a link capacity), so False. (2) Low bandwidth can cause queuing and delay, so True. (3) Lower latency can improve effective throughput, so True.
+
+**⚠ Flag:** NOTE: Statement 3 is cut off in the PDF ("decreasing network ."). The missing word is almost certainly "latency". The reviewer's marks (F, T, T) are shown next to the statements on the slide.
 
 ---
 
 ## Q19
 
-**Question:** Move each cloud computing service model from the list on the left to the correct example on the `[right]`
+- **PDF page:** 23
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (service models):**
+> Move each cloud computing service model from the list on the left to the correct example on the right.  
 
-- IAAS
-- SAAS
-- PAAS
+**Items (left):**
 
-**Match To (examples):**
+- IaaS
+- SaaS
+- PaaS
 
-- A company develops application using cloud-based resources and `[cut off in PDF]`
-- These virtual machines are connected by a virtual network in the cloud
-- User access a web-based graphics design application in the cloud for a monthly fee
+**Targets (right):**
 
-**Answer:** PAAS → A company develops application using cloud-based resources; IAAS → These virtual machines are connected by a virtual network in the cloud; SAAS → User access a web-based graphics design application in the cloud for a monthly fee.
+- A company develops an application using cloud-based resources and tools.
+- These virtual machines are connected by a virtual network in the cloud.
+- A user accesses a web-based graphics design application in the cloud for a monthly fee.
 
-**Explanation:** PaaS provides a platform for developing applications; IaaS provides virtualized infrastructure (VMs, virtual networks, storage); SaaS delivers finished applications over the internet on a subscription basis.
+**Answer (pairs):**
+
+| Item | Target |
+|---|---|
+| PaaS | A company develops an application using cloud-based resources and tools. |
+| IaaS | These virtual machines are connected by a virtual network in the cloud. |
+| SaaS | A user accesses a web-based graphics design application in the cloud for a monthly fee. |
+
+**Explanation:** PaaS = platform to build apps; IaaS = virtualized infrastructure (VMs, virtual networks); SaaS = finished app over the internet for a subscription.
+
+**⚠ Flag:** NOTE: The PDF prints the list as "LAAS SAAS PAAS" (typo for IAAS) and the answers as "PAAS / IAAS / SAAS".
 
 ---
 
 ## Q20
 
-**Question:** Move each cloud service model on the left to its correct description on the right.
+- **PDF page:** 24
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (service models):**
+> Move each cloud service model on the left to its correct description on the right.  
 
-- IAAS
-- SAAS
-- PAAS
+**Items (left):**
 
-**Match To (descriptions):**
+- IaaS
+- SaaS
+- PaaS
+
+**Targets (right):**
 
 - Provides the hardware and software needed for developing, running, and managing applications.
-- Provide pay-as-you-go access to resources provided on virtual machines and virtual storage.
-- Provide on-demand access to applications delivered remotely over the internet.
+- Provides pay-as-you-go access to resources provided on virtual machines and virtual storage.
+- Provides on-demand access to applications delivered remotely over the internet.
 
-**Answer:** PAAS → Provides the hardware and software needed for developing, running, and managing applications; IAAS → Provide pay-as-you-go access to resources provided on virtual machines and virtual storage; SAAS → Provide on-demand access to applications delivered remotely over the internet.
+**Answer (pairs):**
 
-**Explanation:** PaaS = platform for building/running apps; IaaS = pay-as-you-go compute/storage infrastructure; SaaS = on-demand applications over the internet.
+| Item | Target |
+|---|---|
+| PaaS | Provides the hardware and software needed for developing, running, and managing applications. |
+| IaaS | Provides pay-as-you-go access to resources provided on virtual machines and virtual storage. |
+| SaaS | Provides on-demand access to applications delivered remotely over the internet. |
+
+**Explanation:** PaaS = platform for building/running apps; IaaS = pay-as-you-go compute and storage; SaaS = on-demand applications.
+
+**⚠ Flag:** NOTE: The PDF prints the list as "LAAS SAAS PAAS" (typo for IAAS).
 
 ---
 
 ## Q21
 
-**Question:** Which protocol does an IPv6host use to resolve the MAC address associated with a destination IPv6address?
+- **PDF page:** 25
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which protocol does an IPv6 host use to resolve the MAC address associated with a destination IPv6 address?  
 
 **Options:**
 
@@ -445,34 +611,43 @@
 
 **Answer:** C. Neighbor Discovery Protocol (NDP)
 
-**Explanation:** IPv6 does not use ARP; it uses Neighbor Discovery Protocol (NDP), which operates with ICMPv6, to resolve IPv6 addresses to MAC addresses.
+**Explanation:** IPv6 does not use ARP. NDP (carried in ICMPv6) resolves IPv6 addresses to MAC addresses.
 
 ---
 
 ## Q22
 
-**Question:** Which protocol is used by IPV6enabled host to perform automatic stateless address configuration?
+- **PDF page:** 26
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which protocol is used by an IPv6-enabled host to perform automatic stateless address configuration?  
 
 **Options:**
 
-- A. DHCPV6
-- B. ICMPV6
+- A. DHCPv6
+- B. ICMPv6
 - C. TFTP
 - D. DNS
 
-**Answer:** B. ICMPV6
+**Answer:** C. TFTP
 
-**Explanation:** Stateless address autoconfiguration (SLAAC) is performed using ICMPv6 Router Solicitation and Router Advertisement messages. DHCPv6 is used for stateful address assignment, which is a different mechanism.
+**Explanation:** This is what the reviewer highlighted in the PDF.
+
+**⚠ Flag:** QUESTIONABLE ANSWER. Stateless address autoconfiguration (SLAAC) uses ICMPv6 Router Solicitation / Router Advertisement messages, so the technically correct answer is B. ICMPv6. TFTP is a file-transfer protocol and has nothing to do with address configuration. Keep C as the reviewer's key and show this flag.
 
 ---
 
 ## Q23
 
-**Question:** During the data encapsulation process, which OSI layer adds a header that contains MAC addressing information and a trailer used for error checking?
+- **PDF page:** 27
+- **Type:** single
+- **Duplicate of:** Q11
 
-**Type:** single
+**Question:**
+
+> During the data encapsulation process, which OSI layer adds a header that contains MAC addressing information and a trailer used for error checking?  
 
 **Options:**
 
@@ -483,74 +658,89 @@
 
 **Answer:** C. Data Link
 
-**Explanation:** Duplicate of Q11 with different option order. The Data Link layer adds the MAC-address header and the FCS error-checking trailer to form a frame.
+**Explanation:** Duplicate of Q11 with a different option order.
 
 ---
 
 ## Q24
 
-**Question:** A user initiates a trouble ticket stating that an external web page is not loading. You determine that other resources both internal and external are still reachable. Which command can you use to help locate where the issue is in the network path to the external web page?
+- **PDF page:** 28
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A user initiates a trouble ticket stating that an external web page is not loading. You determine that other resources, both internal and external, are still reachable. Which command can you use to help locate where the issue is in the network path to the external web page?  
 
 **Options:**
 
 - A. ping -t
 - B. tracert
-- C. ipconfig/all
+- C. ipconfig /all
 - D. nslookup
 
 **Answer:** B. tracert
 
-**Explanation:** tracert traces the path packet-by-packet (hop by hop) to the destination, letting you see exactly where along the path the traffic stops — ideal for "one specific site unreachable" scenarios. Since internal and other external resources work, DNS (nslookup) and basic connectivity (ping) are less targeted.
+**Explanation:** tracert shows the path hop by hop, so you can see where traffic stops on the way to the unreachable site.
 
 ---
 
 ## Q25
 
-**Question:** Which two statements are true about the IPv4address of the default gateway configured on a host? (Choose 2.) Note: You will receive partial credit for each correct
+- **PDF page:** 29
+- **Type:** multiple
 
-**Type:** multiple
+**Question:**
+
+> Which two statements are true about the IPv4 address of the default gateway configured on a host? (Choose 2.)  
+> Note: You will receive partial credit for each correct response.  
 
 **Options:**
 
-- A. The IPv4address of the default gateway must be the first host address in the subnet.
-- B. The same default gateway IPv4address is configured on each host on the local network.
-- C. The default gateway is the Loopback0interface IPv4address of the router connected to the same local network as the host.
-- D. The default gateway is the IPv4address of the router interface connected to the same local network as the host.
-- E. Hosts learn the default gateway IPv4address through router advertisement
+- A. The IPv4 address of the default gateway must be the first host address in the subnet.
+- B. The same default gateway IPv4 address is configured on each host on the local network.
+- C. The default gateway is the Loopback0 interface IPv4 address of the router connected to the same local network as the host.
+- D. The default gateway is the IPv4 address of the router interface connected to the same local network as the host.
+- E. Hosts learn the default gateway IPv4 address through router advertisement.
 
 **Answer:** B and D
 
-**Explanation:** All hosts on the local network must use the same default gateway address — the address of the router interface on that local network (Layer 3 gateway). It does not have to be the first usable address (A is false), it is not a loopback address (C is false), and IPv4 hosts do not learn the gateway via router advertisements — that is an IPv6 mechanism (E is false).
+**Explanation:** Every host on the local network uses the same gateway address, which is the router interface on that network. It need not be the first host address (A), is not a loopback address (C), and IPv4 hosts do not learn it through router advertisements (E; that is IPv6).
 
 ---
 
 ## Q26
 
-**Question:** Which two statements are true about the IPv4address of the default gateway configured on a host? (Choose 2.) Note: You will receive partial credit for each correct
+- **PDF page:** 30
+- **Type:** multiple
+- **Duplicate of:** Q25
 
-**Type:** multiple
+**Question:**
+
+> Which two statements are true about the IPv4 address of the default gateway configured on a host? (Choose 2.)  
+> Note: You will receive partial credit for each correct response.  
 
 **Options:**
 
-- A. The IPv4address of the default gateway must be the first host address in the subnet.
-- B. The same default gateway IPv4address is configured on each host on the local network.
-- C. The default gateway is the Loopback0interface IPv4address of the router connected to the same local network as the host.
-- D. The default gateway is the IPv4address of the router interface connected to the same local network as the host.
-- E. Hosts learn the default gateway IPv4address through router advertisement
+- A. The IPv4 address of the default gateway must be the first host address in the subnet.
+- B. The same default gateway IPv4 address is configured on each host on the local network.
+- C. The default gateway is the Loopback0 interface IPv4 address of the router connected to the same local network as the host.
+- D. The default gateway is the IPv4 address of the router interface connected to the same local network as the host.
+- E. Hosts learn the default gateway IPv4 address through router advertisement.
 
 **Answer:** B and D
 
-**Explanation:** Exact duplicate of Q25. The default gateway is the router interface address on the local network, and every host on that network uses the same gateway address.
+**Explanation:** Exact duplicate of Q25.
 
 ---
 
 ## Q27
 
-**Question:** An engineer configured a new VLAN named VLAN2for the Data Center team. When the team tries to ping addresses outside VLAN2from a computer in VLAN2, they are unable to reach them. What should the engineer configure?
+- **PDF page:** 31
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> An engineer configured a new VLAN named VLAN2 for the Data Center team. When the team tries to ping addresses outside VLAN2 from a computer in VLAN2, they are unable to reach them. What should the engineer configure?  
 
 **Options:**
 
@@ -561,15 +751,19 @@
 
 **Answer:** C. Default gateway
 
-**Explanation:** A computer needs a default gateway to reach destinations outside its own local VLAN/subnet. Without a gateway, only local VLAN traffic works — matching the symptom described.
+**Explanation:** A host needs a default gateway to reach destinations outside its own VLAN/subnet.
 
 ---
 
 ## Q28
 
-**Question:** Which information is included in the header of a UDP segment?
+- **PDF page:** 32
+- **Type:** single
+- **Duplicate of:** Q10
 
-**Type:** single
+**Question:**
+
+> Which information is included in the header of a UDP segment?  
 
 **Options:**
 
@@ -580,53 +774,62 @@
 
 **Answer:** C. Port numbers
 
-**Explanation:** Duplicate of Q10 with different option order. The UDP header contains source and destination port numbers (plus length and checksum). IP addresses are in the Layer 3 header, MAC addresses in the Layer 2 header, and sequence numbers are a TCP feature.
+**Explanation:** Duplicate of Q10 with a different option order.
 
 ---
 
 ## Q29
 
-**Question:** What is the purpose of assigning an IPaddress to the management VLAN interface on a Layer 2switch?
+- **PDF page:** 33
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> What is the purpose of assigning an IP address to the management VLAN interface on a Layer 2 switch?  
 
 **Options:**
 
 - A. To enable access to the CLI on the switch through Telnet or SSH
 - B. To enable the switch to provide DHCP services to other switches in the network
 - C. To enable the switch to act as a default gateway for the attached devices
-- D. To enable the switch to resolve URLs for the attached the devices
+- D. To enable the switch to resolve URLs for the attached devices
 
 **Answer:** A. To enable access to the CLI on the switch through Telnet or SSH
 
-**Explanation:** A Layer 2 switch needs an IP address on its management (SVI) interface so it can be managed remotely via Telnet or SSH. A pure Layer 2 switch does not route (so it cannot be a default gateway), does not resolve URLs, and does not provide DHCP services by default.
+**Explanation:** The management SVI address lets administrators reach the switch remotely (Telnet/SSH). A Layer 2 switch does not route, resolve URLs, or act as a gateway.
 
 ---
 
 ## Q30
 
-**Question:** Which of the following is a characteristic of the Spanning Tree Protocol (STP)?
+- **PDF page:** 34
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which of the following is a characteristic of the Spanning Tree Protocol (STP)?  
 
 **Options:**
 
-- A. prevents loops in a network by blocking redundant links.
-- B. provides load balancing across multiple paths in a network.
-- C. prioritizes network traffic based on Quality of Service (QoS)settings.
-- D. allows for rapid convergence by eliminating the need for spanning tree
+- A. Prevents loops in a network by blocking redundant links.
+- B. Provides load balancing across multiple paths in a network.
+- C. Prioritizes network traffic based on Quality of Service (QoS) settings.
+- D. Allows for rapid convergence by eliminating the need for spanning tree.
 
-**Answer:** A. prevents loops in a network by blocking redundant links.
+**Answer:** A. Prevents loops in a network by blocking redundant links.
 
-**Explanation:** STP's sole purpose is to prevent Layer 2 loops in networks with redundant links by placing redundant ports into a blocking state, creating a loop-free logical topology.
+**Explanation:** STP prevents Layer 2 loops by placing redundant ports in a blocking state.
 
 ---
 
 ## Q31
 
-**Question:** What protocol is used by OSPF to form neighbor relationships and exchange routing information?
+- **PDF page:** 35
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> What protocol is used by OSPF to form neighbor relationships and exchange routing information?  
 
 **Options:**
 
@@ -635,55 +838,68 @@
 - C. MP (Multiprotocol)
 - D. Llo (Link-Local Operations)
 
-**Answer:** B. P (Protocol)
+**Answer:** D. Llo (Link-Local Operations)
 
-**Explanation:** ⚠️ The PDF options are clearly truncated (only fragments remain: "CP", "P", "MP", "Llo"), so the exact option wording and the reviewer's intended answer cannot be fully verified. Technically, OSPF does not use TCP or UDP — its messages (including Hello packets used to form neighbor relationships) are encapsulated directly in IP (IP protocol number 89), so the intended answer is the IP option, corresponding to option B as printed.
+**Explanation:** This is what the reviewer highlighted in the PDF.
+
+**⚠ Flag:** QUESTIONABLE ANSWER / GARBLED OPTIONS. OSPF forms neighbors with Hello packets carried directly over IP (IP protocol 89), not TCP or UDP. None of the printed options is technically accurate (option text looks like truncated "TCP", "IP", "MP"...). B ("P") may be a truncated "IP". The reviewer's key is D; keep D as the key and show this flag.
 
 ---
 
 ## Q32
 
-**Question:** What information is contained in the MAC address table of a switch?
+- **PDF page:** 36
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> What information is contained in the MAC address table of a switch?  
 
 **Options:**
 
-- A. Dynamically learned Layer2and Layer3addresses of devices communicating on active ports on the switch
+- A. Dynamically learned Layer 2 and Layer 3 addresses of devices communicating on active ports on the switch
 - B. The MAC addresses of devices communicating on active ports and static MAC addresses configured by the administrator
-- C. All active ports on the switch and the host Layer3addresses that were dynamically learned on each port.
-- D. MAC addresses to IP Address mappings learned through ARP requests or manually configured by the administrator
+- C. All active ports on the switch and the host Layer 3 addresses that were dynamically learned on each port
+- D. MAC addresses to IP address mappings learned through ARP requests or manually configured by the administrator
 
 **Answer:** B. The MAC addresses of devices communicating on active ports and static MAC addresses configured by the administrator
 
-**Explanation:** A switch MAC address table maps MAC addresses to ports. It contains dynamically learned entries plus any static MAC addresses configured by the administrator. Layer 3 (IP) information is not stored in the MAC table — option D describes an ARP table, not a MAC address table.
+**Explanation:** A MAC address table maps MAC addresses to ports (dynamic and static entries). Layer 3 data is not stored there; D describes an ARP table.
 
 ---
 
 ## Q33
 
-**Question:** What is the purpose of a subnet mask?
+- **PDF page:** 37
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> What is the purpose of a subnet mask?  
 
 **Options:**
 
-- A. determine the network portion of an IP address
-- B. determine the host portion of an IP address
-- C. determine the default gateway for a network
-- D. determine the DNS server for a network
+- A. Determine the network portion of an IP address
+- B. Determine the host portion of an IP address
+- C. Determine the default gateway for a network
+- D. Determine the DNS server for a network
 
-**Answer:** A. determine the network portion of an IP address
+**Answer:** A. Determine the network portion of an IP address
 
-**Explanation:** The subnet mask's primary purpose is to identify which part of an IP address is the network portion (the bits where the mask is 1). ⚠️ Note: By extension it also reveals the host portion (option B), since the mask divides the address into the two parts, but the reviewer treats A as the best answer — a subnet mask has nothing to do with gateways or DNS servers.
+**Explanation:** The mask marks which bits are the network portion.
+
+**⚠ Flag:** NOTE: B is also arguably true (the mask also defines the host portion). The reviewer keys A.
 
 ---
 
 ## Q34
 
-**Question:** A user at you company cannot connect to website on the internet. However, they can connect to network resources on the company LAN. You want to use the divide and conquer approach to troubleshoot the issue. What should you do first?
+- **PDF page:** 38
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A user at your company cannot connect to a website on the internet. However, they can connect to network resources on the company LAN. You want to use the divide-and-conquer approach to troubleshoot the issue. What should you do first?  
 
 **Options:**
 
@@ -694,15 +910,18 @@
 
 **Answer:** B. Ping the default gateway from the user's computer
 
-**Explanation:** With the divide-and-conquer method you start at the middle of the OSI stack (Layer 3) rather than at the bottom. Since LAN access works, Layers 1–2 are likely fine; pinging the default gateway tests Layer 3 and immediately tells you which half of the stack to investigate.
+**Explanation:** Divide and conquer starts in the middle of the stack (Layer 3). Since the LAN works, pinging the default gateway tests Layer 3 and shows which direction to troubleshoot.
 
 ---
 
 ## Q35
 
-**Question:** Your company has 20Cisco switches throughout its building. You need to view the configuration of each switch from the command line. Which protocol should you use?
+- **PDF page:** 39
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Your company has 20 Cisco switches throughout its building. You need to view the configuration of each switch from the command line. Which protocol should you use?  
 
 **Options:**
 
@@ -713,15 +932,25 @@
 
 **Answer:** D. SNMP (Simple Network Management Protocol)
 
-**Explanation:** Among the listed options, SNMP is the network management protocol used to access and collect data from network devices. ⚠️ Note: In real practice, viewing a switch's configuration from the command line is done via SSH (or Telnet), which is not offered as an option here; given the choices, the reviewer intends SNMP as the management protocol answer.
+**Explanation:** Among the choices, SNMP is the network-management protocol.
+
+**⚠ Flag:** NOTE: In practice, viewing a switch configuration from the command line is done with SSH or Telnet, which is not offered. The reviewer keys SNMP.
 
 ---
 
+# Section 2 — Security
+
+*PDF pages 42–52 (Q36–Q46)*
+
+
 ## Q36
 
-**Question:** Which device protects the network by permitting or denying traffic based on IP address, port number, or application?
+- **PDF page:** 42
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which device protects the network by permitting or denying traffic based on IP address, port number, or application?  
 
 **Options:**
 
@@ -732,71 +961,83 @@
 
 **Answer:** A. Firewall
 
-**Explanation:** A firewall filters traffic based on rules that examine source/destination IP addresses, port numbers, protocols, and applications, permitting or denying traffic accordingly.
+**Explanation:** A firewall permits or denies traffic by rules on addresses, ports, protocols, and applications.
 
 ---
 
 ## Q37
 
-**Question:** How does a firewall determine which traffic to block?
+- **PDF page:** 43
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> How does a firewall determine which traffic to block?  
 
 **Options:**
 
 - A. The firewall matches traffic based on the IP address in the ARP table
 - B. The firewall performs a one-to-many network address translation
 - C. The firewall matches the traffic based on source and destination IP address
-- D. The firewall performs a one-to-one network address `[translation]`
+- D. The firewall performs a one-to-one network address translation.
 
 **Answer:** C. The firewall matches the traffic based on source and destination IP address
 
-**Explanation:** Firewalls examine traffic against configured rules — matching attributes such as source and destination IP addresses (as well as ports and protocols) — to decide whether to permit or deny. NAT functions (options B and D) are address translation, not traffic filtering logic, and the ARP table (option A) is unrelated to firewall rule decisions.
+**Explanation:** Firewalls match traffic against rules (source/destination IP, and also ports/protocols). NAT is address translation, not filtering.
 
 ---
 
 ## Q38
 
-**Question:** You plan to use a network firewall to protect computers at a small `[office / business]`
+- **PDF page:** 44
+- **Type:** true_false
 
-**Type:** true_false
+**Question:**
 
-**Options:**
+> You plan to use a network firewall to protect computers at a small office.  
 
-- A firewall can block traffic to specific ports on internal computers.
-- A firewall can direct all web traffic to a specific IP address.
-- A firewall can prevent specific apps from running on a computer.
+**Statements:**
 
-**Answer:** Statement 1 — True; Statement 2 — True; Statement 3 — False.
+- 1. A firewall can block traffic to specific ports on internal computers.
+- 2. A firewall can direct all web traffic to a specific IP address.
+- 3. A firewall can prevent specific apps from running on a computer.
 
-**Explanation:** As indicated in the reviewer: A firewall can filter traffic by port (True), and it can redirect/direct traffic such as web traffic to a specific address (True) — but preventing applications from running on a computer is endpoint/application-control software functionality, not a network firewall function (False).
+**Answer:** 1 — True; 2 — True; 3 — False
+
+**Explanation:** A network firewall can filter by port and can redirect (port-forward) web traffic to a specific address, but it cannot stop applications from running on a computer (that is endpoint software).
 
 ---
 
 ## Q39
 
-**Question:** Which best describes confidentiality with regards to network security?
+- **PDF page:** 45
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which best describes confidentiality with regard to network security?  
 
 **Options:**
 
 - A. Ensures data is available for access by providing redundant systems.
-- B. Ensures data is not changed during transit between system.
+- B. Ensures data is not changed during transit between systems.
 - C. Ensures data is kept secret using safeguards to prevent unauthorized access.
-- D. Ensures data is trusted and has not been tampered with or changed
+- D. Ensures data is trusted and has not been tampered with or changed.
 
 **Answer:** C. Ensures data is kept secret using safeguards to prevent unauthorized access.
 
-**Explanation:** Confidentiality means keeping data secret from unauthorized parties. Option A describes availability, while options B and D describe integrity.
+**Explanation:** A describes availability; B and D describe integrity.
 
 ---
 
 ## Q40
 
-**Question:** Which component of the AAA service security model provides identify verification?
+- **PDF page:** 46
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which component of the AAA service security model provides identity verification?  
 
 **Options:**
 
@@ -807,15 +1048,20 @@
 
 **Answer:** A. Authentication
 
-**Explanation:** Authentication is the "who are you?" step of AAA — it verifies identity (e.g., username/password, certificates). Authorization defines what a user may do, and accounting records what the user did.
+**Explanation:** Authentication verifies identity. Authorization defines permissions; accounting records activity.
+
+**⚠ Flag:** NOTE: The PDF's first printing of this question reads "identify verification" (typo); the same question reappears as Q46 spelled "identity verification".
 
 ---
 
 ## Q41
 
-**Question:** When setting up a wireless network which security benefit is provided by enabling WPA3?
+- **PDF page:** 47
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> When setting up a wireless network, which security benefit is provided by enabling WPA3?  
 
 **Options:**
 
@@ -826,111 +1072,162 @@
 
 **Answer:** C. Secures authentication between client and access point
 
-**Explanation:** WPA3's headline improvement is Simultaneous Authentication of Equals (SAE), which replaces the WPA2 PSK 4-way handshake and secures the client-to-access-point authentication exchange (resistant to offline dictionary attacks). Encryption of traffic already existed in WPA2; "encrypted tunnel" (option B) describes a VPN, not WPA3.
+**Explanation:** WPA3 replaces the WPA2-PSK handshake with SAE, securing client-to-AP authentication against offline dictionary attacks.
 
 ---
 
 ## Q42
 
-**Question:** Move the CIA security principles from the list on the left to its example on the right.
+- **PDF page:** 48
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (CIA principles):**
+> Move the CIA security principles from the list on the left to their examples on the right.  
+
+**Items (left):**
 
 - Confidentiality
 - Integrity
 - Availability
 
-**Match To (examples):**
+**Targets (right):**
 
-- You generate a digital signature and attach it to a message
-- You encrypt a sensitive email message
-- You configure three redundant web servers at your company
+- You generate a digital signature and attach it to a message.
+- You encrypt a sensitive email message.
+- You configure three redundant web servers at your company.
 
-**Answer:** Integrity → You generate a digital signature and attach it to a message; Confidentiality → You encrypt a sensitive email message; Availability → You configure three redundant web servers at your company.
+**Answer (pairs):**
 
-**Explanation:** Digital signatures prove a message was not altered (integrity). Encryption keeps content secret (confidentiality). Redundant servers keep services up (availability).
+| Item | Target |
+|---|---|
+| Integrity | You generate a digital signature and attach it to a message. |
+| Confidentiality | You encrypt a sensitive email message. |
+| Availability | You configure three redundant web servers at your company. |
+
+**Explanation:** Digital signature = integrity; encryption = confidentiality; redundant servers = availability.
 
 ---
 
 ## Q43
 
-**Question:** Move the MFA factors from the list on the left to their correct examples on he right Factors: Possession, Inference, Knowledge
+- **PDF page:** 49
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (factors):**
+> Move the MFA factors from the list on the left to their correct examples on the right.  
+> Factors: Possession, Inference, Knowledge  
+
+**Items (left):**
 
 - Possession
 - Inference
 - Knowledge
 
-**Match To (examples):**
+**Targets (right):**
 
-- Specifying your name and password to log on to a service
-- Entering a one-time security code send to your device after logging in
-- Holding your phone to your face to be recognized
+- Specifying your name and password to log on to a service.
+- Entering a one-time security code sent to your device after logging in.
+- Holding your phone to your face to be recognized.
 
-**Answer:** Knowledge → Specifying your name and password to log on to a service; Possession → Entering a one-time security code send to your device after logging in; Inherence → Holding your phone to your face to be recognized.
+**Answer (pairs):**
 
-**Explanation:** Something you know = password; something you have = the device receiving the one-time code; something you are = biometric face recognition. ⚠️ Note: The PDF's factor list says "Inference" but the shown answer uses "Inherence" — the correct MFA term is Inherence (biometrics). Both spellings are preserved as they appear.
+| Item | Target |
+|---|---|
+| Knowledge | Specifying your name and password to log on to a service. |
+| Possession | Entering a one-time security code sent to your device after logging in. |
+| Inference | Holding your phone to your face to be recognized. |
+
+**Explanation:** Something you know = password; something you have = device receiving the code; something you are = biometrics.
+
+**⚠ Flag:** NOTE: The PDF's factor list says "Inference", but the reviewer's answer on the slide says "Inherence". The correct MFA term is Inherence (biometrics). In an app, label that factor "Inherence" (optionally show "Inference" as printed in the PDF).
 
 ---
 
 ## Q44
 
-**Question:** Move the security options from the list on the left to its characteristics on the right. You may use each security option once, more than once, or not at `[all]`
+- **PDF page:** 50
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (security options):**
+> Move the security options from the list on the left to their characteristics on the right. You may use each security option once, more than once, or not at all.  
+
+**Items (left):**
 
 - WEP
 - WPA2-Personal
 - WPA-Enterprise
 
-**Match To (characteristics):**
+**Targets (right):**
 
-- Uses a minimum of 40bits for encryption
-- Use a RADIU Server for authentication
-- Use AES and a pre-shared key for authentication
+- Uses a minimum of 40 bits for encryption.
+- Uses a RADIUS server for authentication.
+- Uses AES and a pre-shared key for authentication.
 
-**Answer:** WEP → Uses a minimum of 40bits for encryption; WPA-Enterprise → Use a RADIU Server for authentication; WPA2-Personal → Use AES and a pre-shared key for authentication.
+**Answer (pairs):**
 
-**Explanation:** WEP is the legacy, weak standard using 40-bit (or 104-bit) keys. WPA/WPA2-Enterprise authenticate users against a RADIUS server (802.1X). WPA2-Personal uses AES-CCMP with a pre-shared key (PSK). ⚠️ Note: "RADIU" is a typo in the PDF for "RADIUS" — preserved as written.
+| Item | Target |
+|---|---|
+| WEP | Uses a minimum of 40 bits for encryption. |
+| WPA-Enterprise | Uses a RADIUS server for authentication. |
+| WPA2-Personal | Uses AES and a pre-shared key for authentication. |
+
+**Explanation:** WEP is the legacy standard using 40-bit (or 104-bit) keys; WPA-Enterprise authenticates against a RADIUS server (802.1X); WPA2-Personal uses AES with a pre-shared key.
+
+**⚠ Flag:** NOTE: The PDF prints "RADIU Server" (typo for RADIUS); corrected here.
 
 ---
 
 ## Q45
 
-**Question:** You need to configure wireless settings for a home router. Move the actions from the list on the left to the correct scenarios on the `[right]`
+- **PDF page:** 51
+- **Type:** matching
 
-**Type:** matching
+**Question:**
 
-**Options (actions):**
+> You need to configure wireless settings for a home router. Move the actions from the list on the left to the correct scenarios on the right.  
 
-- Disable SSID broadcasting
+**Exhibit (exact description of the image / diagram / command output):**
+
+Slide layout: the three scenarios are listed on the left, and the reviewer wrote a small answer label after each one ("Disable SSID broadcasting", "Set the security mode to WPA2-PSK", "Disable WPS"). The three action options are shown color-highlighted on the right.  
+
+**Items (left):**
+
 - Set the security mode to WPA2-PSK
+- Disable SSID broadcasting
 - Disable WPS
 
-**Match To (scenarios):**
+**Targets (right):**
 
-- You want to prevent users from using the pushbutton method for accessing the `[network]`
+- You want to prevent users from using the push-button method for accessing the network.
 - You want devices to use a pre-shared key when connecting to the network.
-- You want to prevent devices from discovering the name of the WIFI network
+- You want to prevent devices from discovering the name of the WiFi network.
 
-**Answer:** Disable WPS → You want to prevent users from using the pushbutton method for accessing the network; Set the security mode to WPA2-PSK → You want devices to use a pre-shared key when connecting to the network; Disable SSID broadcasting → You want to prevent devices from discovering the name of the WIFI network.
+**Answer (pairs):**
 
-**Explanation:** WPS (Wi-Fi Protected Setup) is the pushbutton/PIN easy-join method — disabling it blocks that method. WPA2-PSK mode uses a pre-shared key. Disabling SSID broadcast hides the network name from casual discovery.
+| Item | Target |
+|---|---|
+| Disable SSID broadcasting | You want to prevent users from using the push-button method for accessing the network. |
+| Set the security mode to WPA2-PSK | You want devices to use a pre-shared key when connecting to the network. |
+| Disable WPS | You want to prevent devices from discovering the name of the WiFi network. |
+
+**Explanation:** This is exactly how the reviewer paired them on the slide.
+
+**⚠ Flag:** QUESTIONABLE ANSWER (two pairings are swapped). The reviewer pairs the push-button scenario with "Disable SSID broadcasting" and the hide-the-network-name scenario with "Disable WPS". Logically: push-button method → Disable WPS; discovering the network name → Disable SSID broadcasting; pre-shared key → Set security mode to WPA2-PSK (that one is correct). Keep the reviewer's pairing as the key and show this flag.
 
 ---
 
 ## Q46
 
-**Question:** Which component of the AAA service security model provides identity verification?
+- **PDF page:** 52
+- **Type:** single
+- **Duplicate of:** Q40
 
-**Type:** single
+**Question:**
+
+> Which component of the AAA service security model provides identity verification?  
 
 **Options:**
 
@@ -941,15 +1238,23 @@
 
 **Answer:** C. Authentication
 
-**Explanation:** Duplicate of Q40 with different option order. Authentication is the AAA component that verifies identity.
+**Explanation:** Duplicate of Q40 with a different option order.
 
 ---
 
+# Section 3 — Endpoints & Media Types
+
+*PDF pages 55–64 (Q47–Q56)*
+
+
 ## Q47
 
-**Question:** Which wireless security option uses a pre-shared key to authenticate clients?
+- **PDF page:** 55
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which wireless security option uses a pre-shared key to authenticate clients?  
 
 **Options:**
 
@@ -960,53 +1265,62 @@
 
 **Answer:** A. WPA2-Personal
 
-**Explanation:** WPA2-Personal (WPA2-PSK) authenticates clients using a pre-shared key known by everyone on the network. WPA2-Enterprise uses 802.1X/RADIUS per-user authentication; 802.1Q is VLAN tagging, a security non-sequitur.
+**Explanation:** WPA2-Personal (PSK) uses a shared key. WPA2-Enterprise and 802.1X use per-user authentication via RADIUS; 802.1Q is VLAN tagging.
 
 ---
 
 ## Q48
 
-**Question:** You need to connect a computer's network adapter to a switch using a 1000BASE-T cable. Which connector should you use?
+- **PDF page:** 56
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> You need to connect a computer's network adapter to a switch using a 1000BASE-T cable. Which connector should you use?  
 
 **Options:**
 
 - A. Coax
 - B. RJ-11
-- C. OS2LC
+- C. OS2 LC
 - D. RJ-45
 
 **Answer:** D. RJ-45
 
-**Explanation:** 1000BASE-T is Gigabit Ethernet over twisted-pair copper cable, terminated with RJ-45 connectors. RJ-11 is for telephone lines, and OS2LC is a fiber connector.
+**Explanation:** 1000BASE-T is Gigabit Ethernet over twisted-pair copper with RJ-45 connectors.
 
 ---
 
 ## Q49
 
-**Question:** Which type of connector should you use to terminate unshielded twisted pair (UTP)cable?
+- **PDF page:** 57
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which type of connector should you use to terminate unshielded twisted pair (UTP) cable?  
 
 **Options:**
 
 - A. ST (Straight Tip)
 - B. SC (Subscriber Connector)
-- C. RJ-45(Registered Jack 45)
-- D. OS2LC
+- C. RJ-45 (Registered Jack 45)
+- D. OS2 LC
 
-**Answer:** C. RJ-45(Registered Jack 45)
+**Answer:** C. RJ-45 (Registered Jack 45)
 
-**Explanation:** UTP (twisted-pair copper Ethernet cable) is terminated with RJ-45 connectors. ST, SC, and LC are all fiber-optic connector types.
+**Explanation:** UTP is terminated with RJ-45. ST, SC, and LC are fiber connectors.
 
 ---
 
 ## Q50
 
-**Question:** You want to store files that will be accessible by every user on your network. Which endpoint device do you need?
+- **PDF page:** 58
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> You want to store files that will be accessible by every user on your network. Which endpoint device do you need?  
 
 **Options:**
 
@@ -1017,15 +1331,24 @@
 
 **Answer:** B. Server
 
-**Explanation:** A file server stores files and makes them accessible to all users on the network. Access points, hubs, and switches are connectivity devices, not storage endpoints.
+**Explanation:** A file server stores files for all network users.
 
 ---
 
 ## Q51
 
-**Question:** What type of interface is the administrator installing in the router? `[image shows a small pluggable transceiver being inserted into a router/switch module slot]`
+- **PDF page:** 59
+- **Type:** image_single
 
-**Type:** image_single
+**Question:**
+
+> What type of interface is the administrator installing in the router?  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q51_page59.png`
+
+Photograph (to the right of the options) of the front of a network device in a rack. Several modular slots are visible with LC fiber patch cables (blue connectors on white/yellow cables) already plugged in, and green status LEDs. On the right, a person's hand holds a small rectangular pluggable transceiver module and is pushing it into an empty slot. A yellow fiber cable runs along the bottom of the photo. The key visual is the small removable transceiver (SFP) being inserted into its cage, which is clearly different from fixed RJ-45, USB, serial, or PoE ports.  
 
 **Options:**
 
@@ -1036,34 +1359,46 @@
 
 **Answer:** B. SFP (Small Form-factor Pluggable)
 
-**Explanation:** The image shows a small hot-pluggable transceiver module being inserted into a module slot — that is an SFP interface, used to add fiber or copper uplink ports to a router or switch.
+**Explanation:** A small hot-pluggable transceiver module being inserted into a module slot is an SFP.
 
 ---
 
 ## Q52
 
-**Question:** A Cisco PoE switch is shown in the following image.Which type of port will provide both data connectivity and power to an IP phone?
+- **PDF page:** 60
+- **Type:** image_single
 
-**Type:** image_single
+**Question:**
+
+> A Cisco PoE switch is shown in the following image. Which type of port will provide both data connectivity and power to an IP phone?  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+(Reconstruction, not in PDF.) Front panel of a Cisco PoE switch with numbered callouts: 2 → console port; 3 and 4 → other management/function ports; 6 → group of RJ-45 PoE Ethernet ports; 7 → SFP/fiber ports. The answer choices refer only to these numbers.  
 
 **Options:**
 
 - A. Port identified with number 2
 - B. Ports identified with number 6
 - C. Ports identified with number 7
-- D. Ports identified with number 3and `[cut off in PDF — presumably "number 4"]`
+- D. Ports identified with number 3 and 4.
 
 **Answer:** B. Ports identified with number 6
 
-**Explanation:** In the switch image, the ports labeled 6 are the RJ-45 Ethernet ports that support Power over Ethernet, delivering both data and power to devices such as IP phones. (Port 2 is the console port, 3/4 are management/function ports, and 7 marks the SFP fiber ports.) ⚠️ Option D is cut off in the PDF ("number 3and ..."), and the option order in this reviewer differs from other circulating versions of this question — the keyed answer is "ports identified with number 6," which is option B in this PDF's ordering.
+**Explanation:** Ports marked 6 are the RJ-45 Ethernet ports with Power over Ethernet, which deliver both data and power to IP phones.
+
+**⚠ Flag:** IMAGE MISSING IN THE PDF. The slide says "A Cisco PoE switch is shown in the following image" but no picture is present on this PDF page. The exhibit description below is NOT taken from the PDF; it is reconstructed from the answer choices and the well-known version of this question (2 = console port, 3 and 4 = other management/function ports, 6 = PoE RJ-45 Ethernet ports, 7 = SFP/fiber uplink ports). If an image is needed, draw a generic Cisco PoE switch front panel with prominent numbered callouts.
 
 ---
 
 ## Q53
 
-**Question:** Which standard contains the specifications for Wi-Fi networks?
+- **PDF page:** 61
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which standard contains the specifications for Wi-Fi networks?  
 
 **Options:**
 
@@ -1075,34 +1410,40 @@
 
 **Answer:** C. IEEE 802.11
 
-**Explanation:** Wi-Fi is defined by the IEEE 802.11 family of standards. IEEE 802.3 is Ethernet (wired LAN), GSM/LTE are cellular standards, and EIA/TIA 568A is a cabling/wiring standard.
+**Explanation:** Wi-Fi is defined by IEEE 802.11. 802.3 is Ethernet; GSM/LTE are cellular; 568A is a cabling standard.
 
 ---
 
 ## Q54
 
-**Question:** Which device is an Internet of Things (IoT)device?
+- **PDF page:** 62
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which device is an Internet of Things (IoT) device?  
 
 **Options:**
 
 - A. An internet-accessible thermostat
 - B. A video streaming server
 - C. A virtual private network concentrator
-- D. A Cloud-based file storage array
+- D. A cloud-based file storage array
 
 **Answer:** A. An internet-accessible thermostat
 
-**Explanation:** An IoT device is an everyday physical object with embedded network connectivity — a smart thermostat is the classic example. Servers, VPN concentrators, and storage arrays are infrastructure devices, not IoT endpoints.
+**Explanation:** IoT devices are everyday objects with embedded network connectivity; the others are infrastructure.
 
 ---
 
 ## Q55
 
-**Question:** Which network technology is not impacted by electromagnetic and radio wave interference?
+- **PDF page:** 63
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> Which network technology is not impacted by electromagnetic and radio wave interference?  
 
 **Options:**
 
@@ -1113,15 +1454,18 @@
 
 **Answer:** C. Fiber
 
-**Explanation:** Fiber-optic cable transmits data as light through glass/plastic, so it is completely immune to electromagnetic interference (EMI) and radio-frequency interference (RFI). All copper media (twisted pair included) and wireless are susceptible.
+**Explanation:** Fiber carries light, so it is immune to EMI/RFI; copper and wireless are susceptible.
 
 ---
 
 ## Q56
 
-**Question:** A cisco switch is not accessible from the network. You need to view its running configuration. Which out of band method can you use to access it?
+- **PDF page:** 64
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A Cisco switch is not accessible from the network. You need to view its running configuration. Which out-of-band method can you use to access it?  
 
 **Options:**
 
@@ -1132,79 +1476,145 @@
 
 **Answer:** C. Console
 
-**Explanation:** The console port provides out-of-band management — a direct local connection that works even when the switch has no network (IP) connectivity. SSH, SNMP, and Telnet are all in-band methods requiring network access.
+**Explanation:** The console port is out-of-band: a direct local connection that works without network connectivity.
 
 ---
 
+# Section 4 — Infrastructure
+
+*PDF pages 67–68 (Q57–Q58)*
+
+
 ## Q57
 
-**Question:** Examine the connections shown in the following image. Move the cable types on the right to the appropriate connection description on the left. You may use each cable type more than once or not at `[all]`
+- **PDF page:** 67
+- **Type:** image_matching
 
-**Type:** image_matching
+**Question:**
 
-**Options (cable types):**
+> Examine the connections shown in the following image. Move the cable types on the right to the appropriate connection description on the left. You may use each cable type more than once or not at all.  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q57_page67.png`
+
+Two server-rack diagrams side by side, with a black label bar "Underground Conduit" at the bottom between them.  
+LEFT rack, titled "Distribution Rack 1 - Building 5", top to bottom: a patch panel (row of ports), "Power Distribution Device0", switch S2, switch S1, router R1, router R2.  
+RIGHT rack, titled "Data Center Rack 2 - Building 1", top to bottom: a patch panel (row of ports), router R3, switch S3, then a large server chassis labeled "Server0".  
+Cables drawn: (1) a short green cable from S1 down to R1 (switch to router R1 Gi0/0/1); (2) a short orange cable between R1 and R2 (R1 Gi0/0/0 to R2 Gi0/0/1); (3) a long blue line from R2 down out of the left rack, through the Underground Conduit, and up into the right rack to R3 (R2 Gi0/0/0 to R3 Gi0/0/0) — this blue line represents the fiber run; (4) green cables in the right rack from R3 to S3 and from S3 over to the network interface card of Server0. Copper links stay inside each rack; the fiber link is the only inter-building link.  
+
+**Items (left):**
 
 - Straight-through UTP Cable
 - Fiber Optic Cable
 - Crossover UTP Cable
 
-**Match To (connections):**
+**Targets (right):**
 
-- Connects Switch to Router R1Gi0/0/1interface
-- Connects Router R2Gi0/0/0to Router R3Gi0/0/0via underground conduit
-- Connects Router R1Gi0/0/0to Router R2Gi0/0/1
-- Connects Switch S3to Server0network interface card
+- Connects Switch to Router R1 Gi0/0/1 interface
+- Connects Router R2 Gi0/0/0 to Router R3 Gi0/0/0 via underground conduit
+- Connects Router R1 Gi0/0/0 to Router R2 Gi0/0/1
+- Connects Switch S3 to Server0 network interface card
 
-**Answer:** Straight-through UTP Cable → Connects Switch S1 to Router R1 Gi0/0/1 interface; Fiber Optic Cable → Connects Router R2 Gi0/0/0 to Router R3 Gi0/0/0 via underground conduit; Crossover UTP Cable → Connects Router R1 Gi0/0/0 to Router R2 Gi0/0/1; Straight-through UTP Cable → Connects Switch S3 to Server0 network interface card.
+**Answer (pairs):**
 
-**Explanation:** Unlike devices (switch-to-router, switch-to-server/PC) use straight-through UTP; like devices (router-to-router) use crossover UTP; the long underground run between buildings uses fiber optic cable.
+| Item | Target |
+|---|---|
+| Straight-through UTP Cable | Connects Switch to Router R1 Gi0/0/1 interface |
+| Fiber Optic Cable | Connects Router R2 Gi0/0/0 to Router R3 Gi0/0/0 via underground conduit |
+| Crossover UTP Cable | Connects Router R1 Gi0/0/0 to Router R2 Gi0/0/1 |
+| Straight-through UTP Cable | Connects Switch S3 to Server0 network interface card |
+
+**Explanation:** Unlike devices (switch to router, switch to server) use straight-through UTP; like devices (router to router) use crossover UTP; the long inter-building run through the underground conduit uses fiber optic cable.
+
+**⚠ Flag:** NOTE: In the PDF the bullet list of cable types prints four bullets ("Straight-through UTP Cable, Fiber Optic, Crossover UTP Cable, Straight-through UTP"); the fourth is a truncated repeat of the first. The three distinct cable types are used here. The first connection reads "Switch to Router R1" and means switch S1 (see diagram).
 
 ---
 
 ## Q58
 
-**Question:** A local company requires two networks in two new buildings. The addresses used in these networks must be in the private network range. Which two address ranges should the company use? (Choose `[two]`)`
+- **PDF page:** 68
+- **Type:** multiple
 
-**Type:** multiple
+**Question:**
+
+> A local company requires two networks in two new buildings. The addresses used in these networks must be in the private network range. Which two address ranges should the company use? (Choose 2.)  
 
 **Options:**
 
-- A. 172.16.0.0to 172.31.255.255
-- B. 192.16.0.0to 192.16.255.255
-- C. 11.0.0.0to 11.255.255.255
-- D. 192.168.0.0to `[cut off in PDF — presumably 192.168.255.255]`
+- A. 172.16.0.0 to 172.31.255.255
+- B. 192.16.0.0 to 192.16.255.255
+- C. 11.0.0.0 to 11.255.255.255
+- D. 192.168.0.0 to 192.168.255.255
 
 **Answer:** A and D
 
-**Explanation:** The RFC 1918 private address ranges are 10.0.0.0–10.255.255.255, 172.16.0.0–172.31.255.255, and 192.168.0.0–192.168.255.255. Options B (192.16.x.x) and C (11.x.x.x) are public ranges. ⚠️ Option D's ending is cut off in the PDF but is clearly the 192.168.0.0 – 192.168.255.255 private range.
+**Explanation:** RFC 1918 private ranges are 10.0.0.0/8, 172.16.0.0/12 (172.16.0.0–172.31.255.255), and 192.168.0.0/16. B (192.16.x.x) and C (11.x.x.x) are public.
 
 ---
 
+# Section 5 — Diagnosing Problems
+
+*PDF pages 71–98 (Q59–Q86)*
+
+
 ## Q59
 
-**Question:** Which two conclusions can you make from the output of the tracert command? (Choose `[two]`) `[image shows a tracert to www.cisco.com over IPv6 with two intermediate "Request timed out" hops]`
+- **PDF page:** 71
+- **Type:** image_multiple
 
-**Type:** image_multiple
+**Question:**
+
+> Examine the following command output. Which two conclusions can you make from the output of the tracert command? (Choose 2.)  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q59_page71.png`
+
+```text
+Windows Command Prompt (black screen, white monospaced text):
+C:\Admin>tracert www.cisco.com
+5   (a stray "5" line appears in the image)
+over a maximum of 30 hops:
+
+  1   <1 ms   <1 ms   <1 ms  2603-6081-943f-72ec-a240-a0ff-fe67-3c14.res6.big.com [2603:6081:943f:72ec:a240:a0ff:fe67:3c14]
+  2   13 ms   11 ms   16 ms  2603-90b3-0a00-01bb-0000-0000-0000-0001.wifi6.biginternet.com [2603:90b3:a00:1bb::1]
+  3   17 ms   25 ms   18 ms  lag-61.zblnnc1001h.netops.exchange.com [2001:db8:a000:0:4::8:d4c]
+  4   16 ms   13 ms   11 ms  lag-29.drhmncev02r.netops.exchange.com [2001:db8:a000:0:4::2:152]
+  5    *        *        *    Request timed out.
+  6    *        *        *    Request timed out.
+  7   19 ms   18 ms   27 ms  lag-0.pr2.dca10.netops.provider.com [2001:db8:1998:0:4::517]
+  8   21 ms   32 ms   23 ms  2001:db8:1998:0:8::639
+  9   16 ms   15 ms   18 ms  vlan-103.r10.spine101.iad03.fab.netarch.provider.com [2600:1408:b400:40b::1]
+ 10   15 ms   17 ms   22 ms  vlan-110.r03.leaf101.iad03.fab.netarch.provider.com [2600:1408:b400:f03::1]
+ 11   17 ms   17 ms   23 ms  vlan-104.r08.tor101.iad03.fab.netarch.provider.com [2600:1408:b400:2908::1]
+ 12   25 ms   19 ms   19 ms  g2600-1408-c400-038d-0000-0000-0000-0b33.deploy.static.et.com [2600:1408:c400:38d::b33]
+
+Trace complete.
+```
 
 **Options:**
 
-- A. The trace successfully reached the www.cisco.comserver.
+- A. The trace successfully reached the www.cisco.com server.
 - B. The trace failed after the fourth hop.
-- C. The IPv6address associated with the www.cisco.com server is 2600:1408:c400:38d::b33.
-- D. The routers at hops 5and 6are offline.
-- E. The device sending the trace has IPv6address 2600:1408:c400:38d:: `[cut off in PDF]`
+- C. The IPv6 address associated with the www.cisco.com server is 2600:1408:c400:38d::b33.
+- D. The routers at hops 5 and 6 are offline.
+- E. The device sending the trace has IPv6 address 2600:1408:c400:38d::b33.
 
 **Answer:** A and C
 
-**Explanation:** ⚠️ The tracert output image is largely illegible in the PDF (OCR garbage). Based on the standard version of this question: although two intermediate hops return "Request timed out" (those routers simply do not respond to ICMP time-exceeded messages), the trace continues and completes, so the destination was successfully reached (A), and the final hop reveals the destination's IPv6 address (C). The timed-out hops are not offline — traffic still passed through them (D is false) — and the trace clearly did not fail after hop 4 (B is false). Option E is cut off and describes a source-address claim not supported by tracert output.
+**Explanation:** The trace ends with "Trace complete." and hop 12 is the www.cisco.com server at 2600:1408:c400:38d::b33. Hops 5 and 6 time out only because those routers do not answer (traffic still passed through them), so B and D are false; E confuses the destination address with the sender's.
 
 ---
 
 ## Q60
 
-**Question:** Which two pieces of information should you include when you initially create a support ticket? (Choose `[two]`)`
+- **PDF page:** 72
+- **Type:** multiple
 
-**Type:** multiple
+**Question:**
+
+> Which two pieces of information should you include when you initially create a support ticket? (Choose 2.)  
 
 **Options:**
 
@@ -1216,66 +1626,89 @@
 
 **Answer:** A and C
 
-**Explanation:** At ticket creation you document what the fault is (a detailed description) and the conditions under which it occurs. Actions taken to resolve (D) are documented later as the ticket progresses, and network inventory details (B) or the troubleshooting procedure used (E) are not part of the initial ticket.
+**Explanation:** At creation you record what the fault is and the conditions under which it occurs. Actions taken to resolve it are added later.
 
 ---
 
 ## Q61
 
-**Question:** Which two statements are true about the IPv4address of the default gateway configured on a host? (Choose `[two]`)`
+- **PDF page:** 73
+- **Type:** multiple
+- **Duplicate of:** Q25
 
-**Type:** multiple
+**Question:**
+
+> Which two statements are true about the IPv4 address of the default gateway configured on a host? (Choose 2.)  
 
 **Options:**
 
-- A. The IPv4address of the default gateway must be the first host address in the subnet.
-- B. The same default gateway IPv4address is configured on each host on the local network.
-- C. The default gateway is the Loopback0interface IPv4address of the router connected to the same local network as the host.
-- D. The default gateway is the IPv4address of the router interface connected to the same local network as the host.
-- E. Hosts learn the default gateway IPv4address through router advertisement
+- A. The IPv4 address of the default gateway must be the first host address in the subnet.
+- B. The same default gateway IPv4 address is configured on each host on the local network.
+- C. The default gateway is the Loopback0 interface IPv4 address of the router connected to the same local network as the host.
+- D. The default gateway is the IPv4 address of the router interface connected to the same local network as the host.
+- E. Hosts learn the default gateway IPv4 address through router advertisement.
 
 **Answer:** B and D
 
-**Explanation:** Exact duplicate of Q25/Q26 (third occurrence). The default gateway is the address of the router interface on the local network, shared by all hosts on that network.
+**Explanation:** Exact duplicate of Q25 and Q26 (third occurrence).
 
 ---
 
 ## Q62
 
-**Question:** An administrator is configuring the host PC-A on the network shown in the following graphic. PC-A must be able to communicate on the local network and on the internet. There is no DHCP server on the network. What information does the administrator need to input in the IPV4protocol properties window?
+- **PDF page:** 74
+- **Type:** image_command
 
-**Type:** image_command
+**Question:**
 
-**Answer:** IP address: a valid unused host address in the 172.100.0.0/16 network (e.g., 172.100.0.10); Subnet mask: 255.255.0.0; Default gateway: 172.100.0.1 (the Router1 G0/0 interface); Preferred DNS server: 172.100.0.254.
+> An administrator is configuring the host PC-A on the network shown in the following graphic. PC-A must be able to communicate on the local network and on the internet. There is no DHCP server on the network. What information does the administrator need to input in the IPv4 protocol properties window?  
 
-**Explanation:** With no DHCP server, all IPv4 settings must be static. From the topology: the network is 172.100.0.0/16 (mask 255.255.0.0), the router interface G0/0 (the default gateway for this LAN) is 172.100.0.1, and the local DNS server shown is 172.100.0.254 — the ISP DNS is not reachable for name resolution without the gateway configured.
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q62_page74.png`
+
+Combined graphic. LEFT: Windows "Internet Protocol Version 4 (TCP/IPv4) Properties" dialog, General tab. Radio button "Use the following IP address" is selected, with empty fields IP address, Subnet mask, Default gateway. Radio button "Use the following DNS server addresses" is selected, with Preferred DNS server filled in (reads about 172.100.025.4) and an empty Alternate DNS server. A "Validate settings upon exit" checkbox, and Advanced..., OK, Cancel buttons.  
+RIGHT: network topology. Top right: an Internet cloud connected to an "ISP" router (address label 10.10.100.254 next to the red link). The ISP router is linked by a red line to "Router1". Router1 interface G0/1 is labeled 10.10.100.78 (facing the ISP). Router1 interface G0/0 is labeled with a red-dashed box "172.100.0.1" (facing the LAN). A red line runs from Router1 down to "Switch1". Switch1 is connected to a server icon on the right (labeled 172.100.0.254) and to "PC-A" below. The LAN is drawn inside a large shaded oval, with a red-dashed box at the bottom reading "Network 172.100.0.0/16".  
+
+**Answer:** NO ANSWER SHOWN IN THE PDF. Suggested answer (derived from the diagram): IP address — any unused host address in 172.100.0.0/16 (for example 172.100.0.10, not .1 or .254); Subnet mask — 255.255.0.0; Default gateway — 172.100.0.1 (Router1 G0/0); DNS server — the DNS server value shown in the dialog.
+
+**Explanation:** With no DHCP, every IPv4 setting is static. From the topology: the LAN is 172.100.0.0/16 (mask 255.255.0.0), the gateway is Router1's LAN interface 172.100.0.1, and the server on the LAN is 172.100.0.254.
+
+**⚠ Flag:** NOTE: The slide shows only the question and the graphic; the answer is not written on it. In the dialog graphic, the Preferred DNS server field is already filled and reads approximately "172 . 100 . 025 . 4" (low resolution; likely meant to be 172.100.0.254, the server shown on the LAN). Treat the suggested answer above as unverified.
 
 ---
 
 ## Q63
 
-**Question:** A help desk technician receives the four trouble tickets listed below. Which ticket should receive the highest priority and be addressed first?
+- **PDF page:** 75
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A help desk technician receives the four trouble tickets listed below. Which ticket should receive the highest priority and be addressed first?  
 
 **Options:**
 
 - A. Ticket 1: A user requests relocation of a printer to a different network jack in the same office. The jack must be patched and made active.
 - B. Ticket 2: An online webinar is taking place in the conference room. The video conferencing equipment lost internet access.
 - C. Ticket 3: A user reports that response time for a cloud-based application is slower than usual.
-- D. Ticket 4: Two users report that wireless access in the cafeteria has been down for the last `[cut off in PDF]`
+- D. Ticket 4: Two users report that wireless access in the cafeteria has been down for the last hour.
 
 **Answer:** B. Ticket 2: An online webinar is taking place in the conference room. The video conferencing equipment lost internet access.
 
-**Explanation:** Ticket priority is based on impact and urgency. Ticket 2 affects a live event with multiple participants right now (high urgency, high business impact). Ticket 1 is a routine move/add/change; Ticket 3 is degraded (not down) performance; Ticket 4 is an outage but in a cafeteria (lower business impact than a live webinar). ⚠️ Option D is cut off in the PDF ("...down for the last" — presumably "few days/hours").
+**Explanation:** Priority = impact and urgency. Ticket 2 is a live event affected right now. Ticket 1 is a routine move/add/change, Ticket 3 is degraded (not down), and Ticket 4 affects two users in a lower-impact area.
 
 ---
 
 ## Q64
 
-**Question:** An engineer configured a new VLAN named VLAN2for the Data Center team. When the team tries to ping addresses outside VLAN2from a computer in VLAN2, they are unable to reach them. What should the engineer configure?
+- **PDF page:** 76
+- **Type:** single
+- **Duplicate of:** Q27
 
-**Type:** single
+**Question:**
+
+> An engineer configured a new VLAN named VLAN2 for the Data Center team. When the team tries to ping addresses outside VLAN2 from a computer in VLAN2, they are unable to reach them. What should the engineer configure?  
 
 **Options:**
 
@@ -1286,15 +1719,18 @@
 
 **Answer:** C. Default gateway
 
-**Explanation:** Exact duplicate of Q27. Hosts in VLAN2 need a default gateway to send traffic to destinations outside their local subnet/VLAN.
+**Explanation:** Exact duplicate of Q27.
 
 ---
 
 ## Q65
 
-**Question:** You are a senior network administrator tasked with diagnosing intermittent connectivity issues on the executive floor of a multinational corporation, which primarily uses iOS devices. After initial checks, you suspect that the problem may be related to SSID settings and network configuration specifics not aligning correctly with the corporate security protocols. Given the high-security requirements and the exclusive use of iOS devices on this floor, which approach should you take to verify and rectify the network settings directly on the affected devices?
+- **PDF page:** 77
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> You are a senior network administrator tasked with diagnosing intermittent connectivity issues on the executive floor of a multinational corporation, which primarily uses iOS devices. After initial checks, you suspect that the problem may be related to SSID settings and network configuration specifics not aligning correctly with the corporate security protocols. Given the high-security requirements and the exclusive use of iOS devices on this floor, which approach should you take to verify and rectify the network settings directly on the affected devices?  
 
 **Options:**
 
@@ -1305,54 +1741,90 @@
 
 **Answer:** B. Manual Configuration
 
-**Explanation:** To verify and correct SSID/security settings (e.g., exact SSID, WPA2/WPA3-Enterprise mode, certificates) on iOS devices in a high-security environment, you manually inspect and configure the Wi-Fi profile on each affected device. A network reset (A) wipes all settings without verifying them and is too blunt for a targeted security check; Fing (C) is a third-party network scanner, unsuitable for verifying corporate security alignment; SSID reconfiguration (D) implies changing the network infrastructure rather than checking the device. ⚠️ The PDF shows no marked answer for this item; B is the logically intended answer.
+**Explanation:** Manually inspect and configure the Wi-Fi profile (SSID, security mode, certificates) on each affected iOS device. A network reset wipes settings without verifying them; Fing is a third-party scanner; SSID reconfiguration changes the infrastructure instead of checking the devices.
 
 ---
 
 ## Q66
 
-**Question:** Which two statements are true about the impact to communication on the network while the router is temporarily offline. Evaluate the `[following]`
+- **PDF page:** 78
+- **Type:** image_multiple
 
-**Type:** image_multiple
+**Question:**
+
+> Which two statements are true about the impact to communication on the network while the router is temporarily offline? Evaluate the graphic.  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q66_page78.png`
+
+Network topology. "Router1" at top center, linked by a red line to an "Internet" cloud on its right. Router1 has two red links going down: down-left to "Switch1" and down-right to "Switch2". Switch1 and Switch2 are also linked directly by a horizontal red line. Under Switch1: a beige box containing PC-A and PC-B, labeled "172.100.0.0/16" and "VLAN 100". Under Switch2: a light-blue box containing PC-C and PC-D, labeled "172.110.0.0/16" and "VLAN 110". To the right of Switch2, outside the boxes: a server icon "File-Srv" labeled "10.0.0.5/16" and "VLAN 10" (no separate cable is clearly drawn to it in the image; it is placed beside Switch2). Caption under the diagram: "While making a configuration change to Router1, a junior technician accidentally reboots the router."  
 
 **Options:**
 
-- A. None of the PC's can access the file server (File-Srv)
+- A. None of the PCs can access the file server (File-Srv)
 - B. The file server (File-Srv) can still access the internet
 - C. PC-A and PC-B can still communicate with each other.
 - D. PC-A, PC-B, PC-C and PC-D can still communicate with each other
 - E. PC-C and PC-D can still communicate with the file server (File-Srv)
 
-**Answer:** A and C
+**Answer:** A and D
 
-**Explanation:** In the topology, Switch1 and Switch2 are directly connected at Layer 2, so same-VLAN local traffic keeps flowing: PC-A and PC-B (VLAN 100) can still communicate (C is true). However, every PC is in a different VLAN than the File-Srv (VLAN 10): PC-A/PC-B are in VLAN 100, PC-C/PC-D in VLAN 110. All inter-VLAN traffic must route through Router1, which is offline — so no PC can reach the file server (A is true, E is false), the server cannot reach the internet (B is false), and PCs in different VLANs cannot communicate with each other (D is false).
+**Explanation:** This is what the reviewer highlighted in the PDF.
+
+**⚠ Flag:** QUESTIONABLE ANSWER. A is correct (every PC is in a different VLAN/subnet from File-Srv, and inter-VLAN routing needs Router1). However D is doubtful: PC-A/PC-B (VLAN 100) and PC-C/PC-D (VLAN 110) are in different VLANs, so they cannot talk to each other without the router. C (PC-A and PC-B, same VLAN on the same switch) is the statement that is clearly still true, so the logically expected answer is A and C. Keep A and D as the reviewer's key and show this flag.
 
 ---
 
 ## Q67
 
-**Question:** Which action does Switch1take? PC-AsendsaframetoPC-C Switch1doesnothaveamappingentryfortheMACaddressofPC-C
+- **PDF page:** 79
+- **Type:** image_single
 
-**Type:** image_single
+**Question:**
+
+> Which action does Switch1 take?  
+> In the network shown in the following graphic, Switch1 is a Layer 2 switch.  
+> PC-A sends a frame to PC-C.  
+> Switch1 does not have a mapping entry for the MAC address of PC-C.  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q67_page79.png`
+
+Topology. "Router1" at top center with interfaces G0/0 (left) and G0/1 (right). Red link from Router1 G0/0 to Switch1 port G0/24 (Switch1 at left). Red link from Router1 G0/1 to Switch2 port G0/24 (Switch2 at right). Red horizontal link between Switch1 G0/23 and Switch2 G0/23. Switch1: PC-A on G0/1, PC-B on G0/2. Switch2: PC-C on G0/1, PC-D on G0/2. Text under the picture: "PC-A sends a frame to PC-C." and "Switch1 does not have a mapping entry for the MAC address of PC-C." Header text above: "In the network shown in the following graphic, Switch1 is a Layer 2 switch."  
 
 **Options:**
 
-- A. Switch1queries Switch2for the MAC address of PC-C
-- B. Switch1drops the frame and sends an error message back to PC-A
-- C. Switch1sends an ARP request to obtain the MAC address of PC-C
-- D. Switch1floods the frame out all active ports except port Gi0/1
+- A. Switch1 queries Switch2 for the MAC address of PC-C
+- B. Switch1 drops the frame and sends an error message back to PC-A
+- C. Switch1 sends an ARP request to obtain the MAC address of PC-C
+- D. Switch1 floods the frame out all active ports except port Gi0/1
 
-**Answer:** D. Switch1floods the frame out all active ports except port Gi0/1
+**Answer:** D. Switch1 floods the frame out all active ports except port Gi0/1
 
-**Explanation:** When a switch receives a unicast frame with an unknown destination MAC, it floods the frame out all active ports except the one it arrived on (PC-A is on Gi0/1, so the frame is flooded everywhere else, including the link toward Switch2 where PC-C resides). Switches never send ARP requests on behalf of hosts (the host does that), never "query" other switches, and do not drop unknown unicast or return error messages.
+**Explanation:** A switch floods a frame with an unknown destination MAC out every active port except the one it arrived on (PC-A is on Gi0/1). Switches do not send ARP requests, query other switches, or return errors.
 
 ---
 
 ## Q68
 
-**Question:** The laptop is connected to port A on the firslswitch. The second switch is connecled to port D on the first switch. The laptop sends a broadcast frame to the first switch. Which ports forward the frame?
+- **PDF page:** 80
+- **Type:** image_single
 
-**Type:** image_single
+**Question:**
+
+> Which port should you identify?  
+> You have two switches that are connected as shown in the image.  
+> The laptop is connected to port A on the first switch. The second switch is connected to port D on the first switch.  
+> The laptop sends a broadcast frame to the first switch.  
+> You need to identify the ports through which the broadcast frame is forwarded.  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q68_page80.png`
+
+Two blue Ethernet switches side by side. First (left) switch has four adjacent ports labeled A, B, C, D (and a larger uplink-style symbol to the right). A laptop sits above the first switch with a thin blue line down to port A. Black curved cables leave ports B and C and go off the top of the picture (to other devices not shown), and a curved cable from port D arcs over to the first port of the second (right) switch. Port A is the ingress port; B, C, D are the other connected ports.  
 
 **Options:**
 
@@ -1363,15 +1835,18 @@
 
 **Answer:** D. B, C and D only
 
-**Explanation:** A broadcast frame is flooded out every active port except the port it was received on. The frame arrived on port A (where the laptop is attached), so it is forwarded out ports B, C, and D — including port D, which carries it to the second switch.
+**Explanation:** A broadcast is flooded out every active port except the ingress port. It arrived on A, so it leaves on B, C, and D (D leads to the second switch).
 
 ---
 
 ## Q69
 
-**Question:** A support technician examines the front panel of a Cisco switch and sees 4Ethernet cables connected in the first four ports. Port 1,2and 3have a green LED. Port 4has a blinking green light. What is the state of the Port 4?
+- **PDF page:** 81
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A support technician examines the front panel of a Cisco switch and sees 4 Ethernet cables connected in the first four ports. Ports 1, 2 and 3 have a green LED. Port 4 has a blinking green light. What is the state of Port 4?  
 
 **Options:**
 
@@ -1382,53 +1857,83 @@
 
 **Answer:** D. Link is up and active
 
-**Explanation:** On Cisco switch port LEDs, solid green means link is up with no current activity, while a blinking green LED means the link is up and actively transmitting/receiving traffic.
+**Explanation:** Solid green = link up, no activity; blinking green = link up and passing traffic.
 
 ---
 
 ## Q70
 
-**Question:** A user reports a problem connecting to network resources. Other users connected to the same switch are not experiencing the same problem. The user's computer is patched to a switch port Gi0/15. The status indicator for this port is blinking alternately green then amber. What does the light pattern indicate about the status of port Gi0/15?
+- **PDF page:** 82
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A user reports a problem connecting to network resources. Other users connected to the same switch are not experiencing the same problem. The user's computer is patched to switch port Gi0/15. The status indicator for this port is blinking alternately green then amber. What does the light pattern indicate about the status of port Gi0/15?  
 
 **Options:**
 
-- A. The port is administratively shutdown
+- A. The port is administratively shut down
 - B. The port is experiencing a high rate of errors.
 - C. The port is blocked by a firewall rule.
-- D. The port is not connected to a powered -on `[device]`
+- D. The port is not connected to a powered-on device.
 
 **Answer:** B. The port is experiencing a high rate of errors.
 
-**Explanation:** An alternating green/amber blinking pattern on a Cisco switch port indicates the link is up but experiencing errors (typically a high error/collision rate or a link fault condition). An administratively down port shows no light, and an unconnected port shows amber (no link). Firewalls do not influence port LEDs. ⚠️ Option D is cut off in the PDF ("powered -on" ...).
+**Explanation:** Alternating green/amber indicates the link is up but experiencing a fault or high error rate. An administratively down port shows no light; firewalls do not affect port LEDs.
 
 ---
 
 ## Q71
 
-**Question:** What can you tell from the command output? A user report that a company website is not available. The help desk technician issues a tracert command to determine if the server hosting the website is reachable over the network. The output of the command is shown as follows: `[tracert to 192.168.1.10 — hop 3 shows "Request timed out" but hops 4 and 5 (the destination) reply successfully]`
+- **PDF page:** 83
+- **Type:** image_single
 
-**Type:** image_single
+**Question:**
+
+> What can you tell from the command output? A user reports that a company website is not available. The help desk technician issues a tracert command to determine if the server hosting the website is reachable over the network. The output of the command is shown as follows:  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q71_page83.png`
+
+```text
+Windows Command Prompt (black, low resolution):
+C:\>tracert 192.168.1.10
+Tracing route to 192.168.1.10 over a maximum of 30 hops:
+  1   0 ms   0 ms   1 ms   192.168.5.1
+  2   1 ms   0 ms   0 ms   10.0.1.1
+  3    *       *       *     Request timed out.
+  4   1 ms   1 ms   0 ms   10.0.0.2
+  5   1 ms   1 ms   0 ms   192.168.1.10
+```
 
 **Options:**
 
-- A. The server with address 192.168.1.10is reachable over the network
-- B. The router at hop 3is not forwarding packets to the IP address 192.168.1.10
-- C. Requests to the web server at 192.168.1.10are being delayed and time out.
-- D. The server address 192.168.1.10is being blocked by a firewall on the router at `[cut off in PDF]`
+- A. The server with address 192.168.1.10 is reachable over the network
+- B. The router at hop 3 is not forwarding packets to the IP address 192.168.1.10
+- C. Requests to the web server at 192.168.1.10 are being delayed and time out.
+- D. The server address 192.168.1.10 is being blocked by a firewall on the router at hop 3.
 
 **Answer:** A. The server with address 192.168.1.10 is reachable over the network
 
-**Explanation:** The trace completes all the way to hop 5, which is the destination 192.168.1.10 itself responding. The "Request timed out" at hop 3 only means that router does not reply to ICMP TTL-exceeded messages (common due to rate-limiting or policy) — traffic clearly passed through it, since hops 4 and 5 responded. If hop 3 were truly not forwarding (B) or filtering (D), the later hops could never have replied.
+**Explanation:** The trace reaches hop 5, the destination itself. The timeout at hop 3 only means that router does not reply to TTL-exceeded messages; hops 4 and 5 answered, so traffic passes through it.
 
 ---
 
 ## Q72
 
-**Question:** Which action can be run directly from the Cisco router's IOS mode shown? `[prompt shown: router1#]`
+- **PDF page:** 84
+- **Type:** image_single
 
-**Type:** image_single
+**Question:**
+
+> Which action can be run directly from the Cisco router's IOS mode shown?  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q72_page84.png`
+
+A black terminal box containing only the prompt "router1#" with a text cursor right after the # (no "(config)" shown). The # prompt is the clue that the router is in privileged EXEC mode.  
 
 **Options:**
 
@@ -1439,118 +1944,241 @@
 
 **Answer:** B. Show running system information
 
-**Explanation:** The prompt router1# is privileged EXEC mode. Privileged EXEC can run show/debug commands (e.g., show running-config, show version). Enabling a routing process, selecting an interface, and entering interface subcommands all require global configuration mode (router1(config)#), which is reached with the configure terminal command.
+**Explanation:** The prompt router1# is privileged EXEC mode, where show and debug commands run. A, C, and D require global configuration mode (router1(config)#).
 
 ---
 
 ## Q73
 
-**Question:** What can you determine about this switch from the command output? Examine the output of the show mac-address-table command on a Cisco 24ports Ethernet switch `[output shows multiple MAC addresses learned on port Gi0/1 across VLANs 1, 2, and 3, plus one STATIC entry on Fa0/5]`
+- **PDF page:** 85
+- **Type:** image_single
 
-**Type:** image_single
+**Question:**
+
+> What can you determine about this switch from the command output? Examine the output of the show mac-address-table command on a Cisco 24-port Ethernet switch.  
+
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q73_page85.png`
+
+```text
+Cisco terminal (black, low resolution):
+Switch>show mac-address-table
+Mac Address Table
+Vlan   Mac Address        Type      Ports
+1      0001.63a7.3614     DYNAMIC   Fa0/4
+1      0030.a363.8719     DYNAMIC   Gig0/1
+2      0001.4244.7dd5     DYNAMIC   Gig0/1
+2      0030.a363.8719     DYNAMIC   Gig0/1
+2      00d0.ff78.00d5     DYNAMIC   Gig0/1
+2      00e0.b08e.2dcb     DYNAMIC   Gig0/1
+3      0030.a363.8719     DYNAMIC   Gig0/1
+3      0060.5c25.494d     DYNAMIC   Fa0/3
+3      00e0.b08e.2dcb     DYNAMIC   Gig0/1
+3      00e0.f740.c81a     DYNAMIC   Fa0/2
+3      ec2e.9879.d11b     STATIC    Fa0/5
+(MAC digits are read from a low-resolution image; the port/VLAN/type pattern is what matters.)
+```
 
 **Options:**
 
 - A. There are eleven active ports on this switch
-- B. Port Fa0/5is set to administratively down.
+- B. Port Fa0/5 is set to administratively down.
 - C. All entries were learned by examining incoming frames.
-- D. Port Gi0/1connects to another switch
+- D. Port Gi0/1 connects to another switch
 
-**Answer:** D. Port Gi0/1connects to another switch
+**Answer:** D. Port Gi0/1 connects to another switch
 
-**Explanation:** Multiple MAC addresses from multiple VLANs are all learned on Gi0/1 — the signature of an uplink to another switch (or trunk carrying several VLANs). Option C is contradicted by the STATIC entry (static entries are configured, not learned from frames), and only a few distinct ports appear in the table, not eleven.
+**Explanation:** Many MAC addresses from several VLANs are learned on Gig0/1, which is typical of an uplink/trunk to another switch. C is wrong because one entry is STATIC (configured, not learned). A is wrong because the table shows only a few distinct ports.
 
 ---
 
 ## Q74
 
-**Question:** For each statement about output, select True or False. You connect to a Cisco switch and run the following command. show ip interface brief. The command displays the following partial `[output: Gi0/0 = 192.168.1.10, up/up; Gi0/1 = unassigned, down/down; Gi0/2 = unassigned, administratively down/down]`
+- **PDF page:** 86
+- **Type:** image_true_false
 
-**Type:** true_false
+**Question:**
 
-**Options:**
+> For each statement about output, select True or False.  
+> You connect to a Cisco switch and run the following command: show ip interface brief  
+> The command displays the following partial output.  
 
-- A device connected to GigabitEthernet0/1can send out broadcast traffic.
-- A technician issued the shutdown command on interface GigabitEthernet0/2.
-- A technician set the IP address for GigabitEthernet0/0by using the CLI.
+**Exhibit (exact description of the image / diagram / command output):**
 
-**Answer:** Statement 1 — False; Statement 2 — True; Statement 3 — True.
+*Image file:* `exhibits/Q74_page86.png`
 
-**Explanation:** As marked in the reviewer: (1) False — Gi0/1 is down/down, so no device can send any traffic, broadcast included; (2) True — Gi0/2 shows "administratively down," which only occurs when the shutdown command is configured; (3) True — Gi0/0's Method column shows "manual," meaning the IP address was configured manually via the CLI (not DHCP).
+```text
+Cisco terminal table (black):
+Interface            IP-Address     OK?   Method   Status                  Protocol
+GigabitEthernet0/0   192.168.1.10   YES   manual   up                      up
+GigabitEthernet0/1   unassigned     YES   manual   down                    down
+GigabitEthernet0/2   unassigned     YES   unset    administratively down   down
+```
+
+**Statements:**
+
+- 1. A device connected to GigabitEthernet0/1 can send out broadcast traffic.
+- 2. A technician issued the shutdown command on interface GigabitEthernet0/2.
+- 3. A technician set the IP address for GigabitEthernet0/0 by using the CLI.
+
+**Answer:** 1 — False; 2 — True; 3 — True
+
+**Explanation:** (1) Gi0/1 is down/down, so nothing can be sent. (2) "administratively down" appears only when shutdown is configured. (3) Method "manual" means the address was configured by hand (CLI), not by DHCP.
 
 ---
 
 ## Q75
 
-**Question:** You purchase a new Cisco switch, turn it on and connect to its console port. You then run the following command: show running-config | section include interface — output: interface GigabitEthernet0/1, interface GigabitEthernet0/2 `[output omitted]`
+- **PDF page:** 87
+- **Type:** image_true_false
 
-**Type:** true_false
+**Question:**
 
-**Options:**
+> You purchase a new Cisco switch, turn it on and connect to its console port. You then run the following command.  
 
-- The two interfaces can communicate over Layer 2.
-- The two interfaces are administratively shut down.
-- The two interfaces have default IP address `[cut off in PDF — likely "addresses configured"]`
+**Exhibit (exact description of the image / diagram / command output):**
 
-**Answer:** Statement 1 — True; Statement 2 — False; Statement 3 — False.
+*Image file:* `exhibits/Q75_page87.png`
 
-**Explanation:** A brand-new (default) switch has all ports enabled at Layer 2 with no shutdown command, so interfaces on the same switch can communicate at Layer 2 (statement 1 True, statement 2 False). Layer 2 switch ports have no IP addresses at all by default, so the claim that they have (default) IP addresses is False. ⚠️ The third statement is cut off in the PDF, so its exact wording cannot be fully verified.
+```text
+Black Cisco CLI window:
+#show running-config | section include interface
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+<output omitted>
+(No shutdown commands and no IP address commands appear under either interface.)
+```
+
+**Statements:**
+
+- 1. The two interfaces can communicate over Layer 2.
+- 2. The two interfaces are administratively shut down.
+- 3. The two interfaces have default IP address assigned.
+
+**Answer:** 1 — True; 2 — False (not marked in PDF); 3 — False (not marked in PDF)
+
+**Explanation:** A new switch has all ports enabled at Layer 2 with no shutdown, so the interfaces can communicate at Layer 2. No shutdown command appears under either interface, and Layer 2 switch ports have no IP addresses by default.
+
+**⚠ Flag:** NOTE: On the slide only statement 1 is highlighted as correct (True). Statements 2 and 3 carry no mark; they are False by the logic above.
 
 ---
 
 ## Q76
 
-**Question:** A help desk technician is working on a computer that is unable to resolve URLs in the browser. The technician runs the ipconfig/all command and receives the following `[output: IPv4 192.168.0.10, gateway 192.168.0.1, DHCP 192.168.10.1, DNS Servers 64.100.8.8]`. You need to issue a command to view the network devices in the path from the computer to the server that resolves the host name. What command should you issue?
+- **PDF page:** 88
+- **Type:** image_command
 
-**Type:** command
+**Question:**
 
-**Answer:** `tracert 64.100.8.8`
+> A help desk technician is working on a computer that is unable to resolve URLs in the browser. The technician runs the ipconfig /all command and receives the following output.  
+> You need to issue a command to view the network devices in the path from the computer to the server that resolves the host name. What command should you issue?  
 
-**Explanation:** The server that resolves host names is the DNS server, listed in the ipconfig/all output as 64.100.8.8. To view the network devices (hops) in the path to it, run tracert 64.100.8.8. (Note: the DNS server is on a different subnet than the PC — 64.100.x.x vs 192.168.0.x — which is itself suspicious for a DNS configuration, but per the question the requested command is tracert to the DNS address.)
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q76_page88.png`
+
+```text
+Black console excerpt of ipconfig /all:
+Connection-specific DNS Suffix  . : local.co
+Physical Address. . . . . . . . . : 0004.9A64.227D
+IPv4 Address. . . . . . . . . . . : 192.168.0.10
+Subnet Mask . . . . . . . . . . . : 255.255.255.0
+Default Gateway . . . . . . . . . : 192.168.0.1
+DHCP Servers. . . . . . . . . . . : 192.168.10.1
+DNS Servers . . . . . . . . . . . : 64.100.8.8
+```
+
+**Answer:** NO ANSWER SHOWN IN THE PDF. Suggested answer: tracert 64.100.8.8
+
+**Explanation:** The server that resolves host names is the DNS server, 64.100.8.8. tracert to that address lists the devices (hops) in the path to it.
+
+**⚠ Flag:** NOTE: Answer is not written on the slide; suggested answer is derived from the exhibit.
 
 ---
 
 ## Q77
 
-**Question:** An app on a user's computer is having problems downloading data. The app uses the following URL to download data https://www.companypro.net:7100/api. You need to use Wireshark to capture packets sent to and received from that `[server]`. What Wireshark filter options would you use to filter the results?
+- **PDF page:** 89
+- **Type:** command
 
-**Type:** command
+**Question:**
 
-**Answer:** `tcp.port == 7100`
+> An app on a user's computer is having problems downloading data. The app uses the following URL to download data: https://www.companypro.net:7100/api  
+> You need to use Wireshark to capture packets sent to and received from that URL. What Wireshark filter options would you use to filter the results?  
 
-**Explanation:** The only fixed, filterable value in the URL is the destination port 7100 (the hostname would resolve to a dynamic IP, and the path is not visible in an IP filter). Filtering on tcp.port == 7100 captures all packets sent to and from that port, i.e., both directions of the app's traffic. (tcp.port eq 7100 is an equivalent accepted syntax.)
+**Answer:** NO ANSWER SHOWN IN THE PDF. Suggested answer: tcp.port == 7100
+
+**Explanation:** The fixed, filterable value in the URL is the port, 7100. tcp.port == 7100 matches packets in both directions. (Another valid form is tcp.port eq 7100; filtering by the server's resolved IP with ip.addr == <address> also works.)
+
+**⚠ Flag:** NOTE: The slide has the question only (no exhibit, no answer). Suggested answer is derived from the URL.
 
 ---
 
 ## Q78
 
-**Question:** Computers in a small office are unable to access companypro.net. You run the ipconfig command on one of the computers. The results are shown in the exhibit. `[ipconfig output: IPv4 192.168.0.14, mask 255.255.255.0, Default Gateway 192.168.0.1, DHCP 192.168.0.1, DNS 8.8.8.8 / 8.8.4.4]`. You need to determine if you can reach the router. Which command should you use?
+- **PDF page:** 90
+- **Type:** image_command
 
-**Type:** image_command
+**Question:**
 
-**Answer:** `ping 192.168.0.1`
+> Computers in a small office are unable to access companypro.net. You run the ipconfig command on one of the computers. The results are shown in the exhibit. You need to determine if you can reach the router. Which command should you use?  
 
-**Explanation:** The router (default gateway) address from the exhibit is 192.168.0.1. Testing reachability to the router is done by pinging that address. (A successful ping confirms local Layer 1–3 connectivity to the gateway; failure isolates the problem to the local link or gateway.)
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q78_page90.png`
+
+```text
+Black console excerpt of ipconfig:
+DHCP Enabled. . . . . . . . . . . : Yes
+Autoconfiguration Enabled . . . . : Yes
+IPv4 Address. . . . . . . . . . . : 192.168.0.14(Preferred)
+Subnet Mask . . . . . . . . . . . : 255.255.255.0
+Lease Obtained. . . . . . . . . . : Sunday, January 8, 2023 11:00:02 AM
+Lease Expires . . . . . . . . . . : Sunday, January 8, 2023 12:00:12 PM
+Default Gateway . . . . . . . . . : 192.168.0.1
+DHCP Server . . . . . . . . . . . : 192.168.0.1
+DNS Servers . . . . . . . . . . . : 8.8.8.8
+                                    8.8.4.4
+NetBIOS over Tcpip. . . . . . . . : Enabled
+```
+
+**Answer:** NO ANSWER SHOWN IN THE PDF. Suggested answer: ping 192.168.0.1
+
+**Explanation:** The router is the default gateway, 192.168.0.1. Pinging it tests local connectivity to the router.
+
+**⚠ Flag:** NOTE: Answer is not written on the slide; suggested answer is derived from the exhibit.
 
 ---
 
 ## Q79
 
-**Question:** You want to list the IPV4addresses associated with the host name `[companypro.net]`. What is the command to execute in this scenario?
+- **PDF page:** 91
+- **Type:** command
 
-**Type:** command
+**Question:**
 
-**Answer:** `nslookup`
+> You want to list the IPv4 addresses associated with the host name www.companypro.net. What is the command to execute in this scenario?  
 
-**Explanation:** nslookup (or nslookup followed by the host name) queries DNS and lists the address records — including the IPv4 (A) addresses — associated with a host name.
+**Answer:** NO ANSWER SHOWN IN THE PDF. Suggested answer: nslookup www.companypro.net
+
+**Explanation:** nslookup queries DNS and lists the address records (including IPv4 A records) for a host name.
+
+**⚠ Flag:** NOTE: The slide has the question only (no exhibit, no answer). Suggested answer is derived from the question.
 
 ---
 
 ## Q80
 
-**Question:** A support technician examines the front panel o fa Cisco switch and sees 4Ethernet cables connected in the first four ports. Ports 1,2,and 3have a green LED. Port 4has a blinking green light. `[What is the state of port 4?]`
+- **PDF page:** 92
+- **Type:** single
+- **Duplicate of:** Q69
 
-**Type:** single
+**Question:**
+
+> A support technician examines the front panel of a Cisco switch and sees 4 Ethernet cables connected in the first four ports. Ports 1, 2, and 3 have a green LED. Port 4 has a blinking green light. (What is the state of Port 4?)  
 
 **Options:**
 
@@ -1561,65 +2189,98 @@
 
 **Answer:** C. Link is up and active.
 
-**Explanation:** Duplicate of Q69 with different option order. A blinking green LED on a Cisco switch port indicates the link is up and passing traffic (active). Solid green would mean link with no current activity.
+**Explanation:** Duplicate of Q69 with a different option order.
+
+**⚠ Flag:** NOTE: The PDF omits the final sentence of the question ("What is the state of Port 4?"); it is implied by Q69 and added here in parentheses.
 
 ---
 
 ## Q81
 
-**Question:** What is the purpose of assigning an IP address to the management VLAN interface on a Layer 2switch?
+- **PDF page:** 93
+- **Type:** single
+- **Duplicate of:** Q29
 
-**Type:** single
+**Question:**
+
+> What is the purpose of assigning an IP address to the management VLAN interface on a Layer 2 switch?  
 
 **Options:**
 
 - A. To enable the switch to act as a default gateway for the attached devices
-- B. To enable the switch to resolve URLs for the attached the devices
+- B. To enable the switch to resolve URLs for the attached devices
 - C. To enable the switch to provide DHCP services to other switches in the network
 - D. To enable access to the CLI on the switch through Telnet or SSH
 
 **Answer:** D. To enable access to the CLI on the switch through Telnet or SSH
 
-**Explanation:** Duplicate of Q29 with different option order. The management SVI IP on a Layer 2 switch exists for remote management access (SSH/Telnet).
+**Explanation:** Duplicate of Q29 with a different option order.
 
 ---
 
 ## Q82
 
-**Question:** What command will display the following output? `[output table: Device ID | Local Intrfce | Holdtme | Capability | Platform | Port ID — with entries for esxi on Gig0/5, Gig0/7, Gig0/6; 981888fc23a7 on Gig0/47 (Meraki MR); 3456fecd1d08 on Gig0/1 (MS120-8LP)]`
+- **PDF page:** 94
+- **Type:** image_command
 
-**Type:** command
+**Question:**
 
-**Answer:** `show cdp neighbors`
+> What command will display the following output?  
 
-**Explanation:** The output columns (Device ID, Local Interface, Holdtime, Capability, Platform, Port ID) are the signature of the Cisco Discovery Protocol neighbor table, displayed with show cdp neighbors (detail).
+**Exhibit (exact description of the image / diagram / command output):**
+
+*Image file:* `exhibits/Q82_page94.png`
+
+```text
+Black console output (the first line is literally "Image is command output that states the following."):
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge, S - Switch, H - Host, I - IGMP,
+
+Device ID       Local Intrfce   Holdtme   Capability   Platform    Port ID
+esxi            Gig 0/5         177       S            VMware ES   vmnic0
+esxi            Gig 0/7         177       S            VMware ES   vmnic1
+esxi            Gig 0/6         177       S            VMware ES   vmnic2
+981888fc23a7    Gig 0/47        160       R S          Meraki MR   Port 0
+3456fecd1d08    Gig 0/1         178       S            MS120-8LP   Port 9"
+```
+
+**Answer:** NO ANSWER SHOWN IN THE PDF. Suggested answer: show cdp neighbors
+
+**Explanation:** The columns (Device ID, Local Interface, Holdtime, Capability, Platform, Port ID) are the Cisco Discovery Protocol neighbor table.
+
+**⚠ Flag:** NOTE: Answer is not written on the slide; suggested answer is derived from the exhibit.
 
 ---
 
 ## Q83
 
-**Question:** A network administrator can successfully ping the URL www.cisco.com, but cannot ping a corporate server located at a remote branch in another city. You need to identify the specific router where packets are being dropped in the path to the remote branch. Which utility should you use?
+- **PDF page:** 95
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> A network administrator can successfully ping www.cisco.com, but cannot ping a corporate server located at a remote branch in another city. You need to identify the specific router where packets are being dropped in the path to the remote branch. Which utility should you use?  
 
 **Options:**
 
 - A. Traceroute
 - B. Netstat
-- C. telnet
+- C. Telnet
 - D. ipconfig
 
 **Answer:** A. Traceroute
 
-**Explanation:** Traceroute (tracert on Windows) reports each hop in the path; the last responding hop before the failures pinpoints where packets are being dropped.
+**Explanation:** Traceroute (tracert on Windows) lists each hop; the last responding hop shows where packets stop.
 
 ---
 
 ## Q84
 
-**Question:** You need to determine whether a remote host is reachable through the network. Which two commands can you see? Each correct command is a complete `[solution]`
+- **PDF page:** 96
+- **Type:** multiple
 
-**Type:** multiple
+**Question:**
+
+> You need to determine whether a remote host is reachable through the network. Which two commands can you use? Each correct answer is a complete solution.  
 
 **Options:**
 
@@ -1631,56 +2292,57 @@
 
 **Answer:** B and E
 
-**Explanation:** Ping tests reachability to the remote host directly, and traceroute/tracert reveals the path and shows how far toward the host traffic gets — both determine whether a remote host is reachable through the network. Netstat shows local connections, and route print/ipconfig show local configuration only.
+**Explanation:** Ping tests reachability directly; traceroute/tracert shows the path and how far traffic gets. Netstat, route print, and ipconfig show local information only.
+
+**⚠ Flag:** NOTE: The PDF prints "Which two commands can you see?" (typo for "use").
 
 ---
 
 ## Q85
 
-**Question:** In a network with multiple VLANs, a user is unable to communicate with other users in the same VLAN but can communicate with users in different VLANs. Which of the following could be the cause of this issue?
+- **PDF page:** 97
+- **Type:** single
 
-**Type:** single
+**Question:**
+
+> In a network with multiple VLANs, a user is unable to communicate with other users in the same VLAN but can communicate with users in different VLANs. Which of the following could be the cause of this issue?  
 
 **Options:**
 
-- A. user's switchport is not configured as an access port.
-- B. user's switchport is not assigned to the correct VLAN.
-- C. user's switchport is configured with the wrong duplex setting.
-- D. user's switchport is experiencing a spanning tree `[issue/block]`
+- A. User's switchport is not configured as an access port.
+- B. User's switchport is not assigned to the correct VLAN.
+- C. User's switchport is configured with the wrong duplex setting.
+- D. User's switchport is experiencing a spanning tree loop.
 
-**Answer:** B. user's switchport is not assigned to the correct VLAN.
+**Answer:** B. User's switchport is not assigned to the correct VLAN.
 
-**Explanation:** If the user's port is assigned to the wrong VLAN, the user ends up in a different broadcast domain than the teammates they should reach (same-VLAN direct communication fails), while traffic to other VLANs still works because inter-VLAN routing through the router is functioning. ⚠️ Note: This question is ambiguous as written — option A (port configured as a trunk rather than an access port) produces a similar symptom in some topologies, since the host's traffic would land on the native VLAN instead of its intended VLAN. Based on the intended pedagogy (a Layer 2 VLAN-assignment fault with routing still working), B is the best answer. Option C (duplex mismatch) would cause errors/slowness, not selective VLAN failure, and option D is truncated in the PDF.
+**Explanation:** If the port is in the wrong VLAN, the user is in a different broadcast domain from the intended teammates, while routing to other VLANs still works.
+
+**⚠ Flag:** NOTE: The question is somewhat ambiguous (A could produce a similar symptom), but B is highlighted by the reviewer.
 
 ---
 
 ## Q86
 
-**Question:** A user initiates a trouble ticket stating that an external web page is not loading. You determine that other resources both internal and external are still reachable. Which command can you use to help locate where the issue is in the network path to the external web page?
+- **PDF page:** 98
+- **Type:** single
+- **Duplicate of:** Q24
 
-**Type:** single
+**Question:**
+
+> A user initiates a trouble ticket stating that an external web page is not loading. You determine that other resources, both internal and external, are still reachable. Which command can you use to help locate where the issue is in the network path to the external web page?  
 
 **Options:**
 
 - A. ping -t
 - B. tracert
-- C. ipconfig/all
-- D. Nslookup
+- C. ipconfig /all
+- D. nslookup
 
 **Answer:** B. tracert
 
-**Explanation:** Duplicate of Q24 (second occurrence). tracert traces the route hop-by-hop to the unreachable page so you can identify exactly where in the path the problem lies.
+**Explanation:** Duplicate of Q24 (second occurrence).
 
 ---
 
-*End of extraction — 86 questions total, in original PDF order, duplicates preserved.*
-Key flags to be aware of when studying from this reviewer (all detailed in the explanations above):
-Q1 – question says 172.16.199.25, all options say 172.16.100.25 (PDF's own inconsistency, answer still /22).
-Q2, Q3, Q4 – subnet masks cut off in the PDF; answers inferred from the original exam questions (/28, /16, /22 respectively).
-Q14 – reviewer puts the NIC at the Physical layer (typically taught as Data Link).
-Q18, Q75 – statements truncated in the PDF; answers inferred.
-Q31 (OSPF) – options severely truncated ("CP", "P", "MP", "Llo"); OSPF runs directly over IP (protocol 89), so the IP option (B as printed) is the intent.
-Q35 – SNMP is the keyed answer, though SSH would be the real-world choice (not listed).
-Q52 (PoE) – option D cut off; keyed answer = ports labeled 6 (= option B in this PDF's ordering).
-Q59 – tracert image mostly illegible; answers A and C per the standard version of this question.
-Q65, Q85 – no marked answer in the PDF / ambiguous item; best-logical answers given (B and B) with the ambiguity explained.
+*End of file — 86 questions, in original PDF order, duplicates preserved.*
