@@ -2173,14 +2173,23 @@ function getIT0204Subtopic(q){
   return 'Topic: General Cybersecurity & Privacy';
 }
 function getNetworkingSubtopic(q){
+  const n = q.sourceNum;
+  if([1,2,3,4,5,6,7,8,25,26,58,61,62].includes(n)) return 'Topic: IP Addressing & Subnetting';
+  if([9,10,11,14,15,23,28,32,67,68].includes(n)) return 'Topic: OSI, TCP/IP & Encapsulation';
+  if([12,13,17,21,22,24,31,35,56,76,77,78,79,82,83,84,86].includes(n)) return 'Topic: Protocols & Commands';
+  if(n>=36 && n<=47) return 'Topic: Security & Wireless';
+  if([48,49,50,51,52,54,55,57,72,73].includes(n)) return 'Topic: Endpoints, Media & Infrastructure';
+  if([19,20].includes(n)) return 'Topic: Cloud & Network Services';
+  if([16,18,53].includes(n)) return 'Topic: General Networking';
+  if([27,29,30,33,34,59,60,63,64,65,66,69,70,71,74,75,80,81,85].includes(n)) return 'Topic: Troubleshooting & Diagnostics';
   const text = (q.q+' '+(q.ex||'')+' '+(q.opts||[]).join(' ')+' '+(q.pairs||[]).map(p=>p.term+' '+p.desc).join(' ')).toLowerCase();
-  if(/cidr|subnet|mask|ipv4|ipv6|address|gateway|slaac|icmpv6|ndp|private/.test(text)) return 'Topic: IP Addressing & Subnetting';
-  if(/osi|tcp\/ip|transport|data link|network layer|application|encapsulation|segment|frame|udp|tcp|port number|mac address/.test(text)) return 'Topic: OSI, TCP/IP & Encapsulation';
-  if(/sftp|tftp|dns|dhcp|icmp|snmp|smtp|ftp|protocol|nslookup|ping|tracert|traceroute|cdp/.test(text)) return 'Topic: Protocols & Commands';
+  if(/trouble ticket|support ticket|tracert|traceroute|ping |reachable|unreachable|path|hop|offline|diagnos|wireshark|filter|led|blinking|alternately|show ip interface|show mac-address-table|mac address table|broadcast frame|flood|unknown destination|configuration change|temporarily offline/.test(text)) return 'Topic: Troubleshooting & Diagnostics';
+  if(/rj-45|utp|fiber|cable|connector|sfp|console|poe|iot|server|switch|router|access point|1000base-t|electromagnetic|internet of things|endpoint/.test(text)) return 'Topic: Endpoints, Media & Infrastructure';
   if(/firewall|confidentiality|integrity|availability|aaa|authentication|authorization|accounting|mfa|wpa|wep|wps|ssid|radius|security/.test(text)) return 'Topic: Security & Wireless';
-  if(/rj-45|utp|fiber|cable|connector|sfp|console|iot|server|switch|router|access point|1000base-t|electromagnetic/.test(text)) return 'Topic: Endpoints, Media & Infrastructure';
-  if(/vlan|mac table|broadcast|flood|led|trouble|ticket|reachable|diagnos|offline|show ip interface|support|path|wireshark|filter/.test(text)) return 'Topic: Troubleshooting & Diagnostics';
   if(/cloud|iaas|paas|saas/.test(text)) return 'Topic: Cloud & Network Services';
+  if(/sftp|tftp|dns|dhcp|icmp|snmp|smtp|ftp|protocol|nslookup|slaac|icmpv6|ndp|cdp|neighbor discovery|stateless address/.test(text)) return 'Topic: Protocols & Commands';
+  if(/osi|tcp\/ip|transport|data link|network layer|application layer|encapsulation|segment|frame|udp|tcp|port number|mac address|header|trailer/.test(text)) return 'Topic: OSI, TCP/IP & Encapsulation';
+  if(/cidr|subnet mask|subnetting|\/\d{1,2}\b|ipv4 address|ipv6 address|link-local ipv6|private network range|default gateway|network 172\.|192\.168\.200\.0\/24|172\.16\.|255\.255\./.test(text)) return 'Topic: IP Addressing & Subnetting';
   return 'Topic: General Networking';
 }
 
@@ -2561,6 +2570,12 @@ function activeTopicKeys(groups){
   const specific = specificTopicKeys(groups);
   return specific.length ? specific : broadTopicKeys(groups);
 }
+function visibleTopicKeys(src, groups){
+  return src==='NETWORKING' ? specificTopicKeys(groups) : Object.keys(groups||{});
+}
+function displayTopicLabel(topic){
+  return String(topic||'').replace(/^Topic:\s*/,'');
+}
 
 // ── Go to topic selector ────────────────────────────────────────────────────
 function goTopics(src){
@@ -2590,7 +2605,8 @@ function buildTopicGrid(src){
   const topicStats = d.topicStats || {};
 
   grid.innerHTML = '';
-  Object.entries(groups).forEach(([topic, ids])=>{
+  visibleTopicKeys(src, groups).forEach(topic=>{
+    const ids = groups[topic] || [];
     {
       const before = grid.lastElementChild;
       const isSubtopic = topic.startsWith('Topic:');
@@ -2598,8 +2614,8 @@ function buildTopicGrid(src){
       if(!before || (isSubtopic && !prevWasSubtopic)){
         const div = document.createElement('div');
         div.className = 'topic-divider';
-        const firstLabel = src==='NETWORKING' ? 'Question Bank Sections' : src==='IT0035' ? 'Exam Sources' : 'Formative Assessments';
-        div.textContent = isSubtopic ? 'Specific Topic Filters' : firstLabel;
+        const firstLabel = src==='IT0035' ? 'Exam Sources' : 'Formative Assessments';
+        div.textContent = src==='NETWORKING' ? 'CCST Topic Filters' : isSubtopic ? 'Specific Topic Filters' : firstLabel;
         grid.appendChild(div);
       }
     }
@@ -2629,7 +2645,7 @@ function buildTopicGrid(src){
     card.innerHTML = `
       <div class="topic-checkbox">${isSelected?'✓':''}</div>
       <div class="topic-info">
-        <div class="topic-name">${esc(topic)}</div>
+        <div class="topic-name">${esc(displayTopicLabel(topic))}</div>
         <div class="topic-progress-wrap">
           <div class="topic-bar-bg"><div class="topic-bar-fill ${barClass}" style="width:${fillWidth}"></div></div>
           <div class="topic-pct" style="color:${pctColor}">${pctDisplay}</div>
@@ -2725,7 +2741,7 @@ function updateReviewerStats(){
   Object.keys(REVIEWER_META).forEach(src=>{
     const groups = TOPIC_GROUPS[src] || {};
     let totalCorrect=0, totalAnswered=0;
-    Object.entries(groups).forEach(([topic, ids])=>{
+    activeTopicKeys(groups).forEach(topic=>{
       const key = src+'::'+topic;
       const stats = topicStats[key]||{correct:0,total:0};
       totalCorrect += stats.correct;
