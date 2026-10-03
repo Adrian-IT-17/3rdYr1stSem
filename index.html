@@ -604,7 +604,10 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
 .exhibit-box{border:1px solid var(--card-border);background:#f8fafc;border-radius:8px;margin:0 0 18px;overflow:hidden}
 .exhibit-title{background:#eef4fb;border-bottom:1px solid var(--card-border);padding:9px 14px;font-size:11px;font-weight:800;color:var(--header);text-transform:uppercase;letter-spacing:.05em}
 .exhibit-content{padding:14px}
-.exhibit-img{display:block;max-width:100%;height:auto;margin:0 auto 12px;border:1px solid var(--card-border);border-radius:6px;background:#fff}
+.exhibit-img{display:block;max-width:100%;max-height:min(52vh,560px);width:auto;height:auto;margin:0 auto;border:1px solid var(--card-border);border-radius:6px;background:#fff;object-fit:contain}
+.exhibit-transcript{margin-top:10px;border-top:1px solid var(--card-border);padding-top:8px}
+.exhibit-transcript summary{cursor:pointer;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.exhibit-transcript-body{margin-top:8px;font-size:13px;line-height:1.55;color:var(--muted)}
 .net-diagram{position:relative;min-height:270px;padding:18px;background:#fff;overflow:hidden}
 .net-svg{width:100%;height:270px;display:block}
 .net-node{fill:#fff;stroke:#1a3a5c;stroke-width:2}
@@ -1050,6 +1053,13 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
   .rev-hdr .btn{width:auto;min-height:36px}
   .rev-item{padding:12px}
   .toast{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));text-align:center}
+  .exhibit-box{margin-bottom:14px;border-radius:8px}
+  .exhibit-title{padding:8px 10px;font-size:10px;line-height:1.3}
+  .exhibit-content{padding:10px}
+  .exhibit-img{max-height:38svh;width:100%;object-fit:contain}
+  .exhibit-transcript{margin-top:8px;padding-top:7px}
+  .exhibit-transcript summary{font-size:10px;line-height:1.35}
+  .exhibit-transcript-body{font-size:12px;line-height:1.5;max-height:240px;overflow:auto;-webkit-overflow-scrolling:touch}
   .net-diagram{min-height:260px;padding:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .net-svg{height:260px;min-width:620px}
   .cli-output{font-size:11px;padding:10px;max-height:260px}
@@ -2270,7 +2280,11 @@ function buildExhibit(q){
     wrap.className='exhibit-box';
     let html=`<div class="exhibit-title">${esc(q.exhibitType||'Source Exhibit')}</div><div class="exhibit-content">`;
     if(q.imageFile) html+=`<img class="exhibit-img" src="${esc(q.imageFile)}" alt="${esc(q.exhibitType||'Question exhibit')}">`;
-    if(q.exhibitDesc) html+=renderText(q.exhibitDesc);
+    if(q.exhibitDesc && q.imageFile){
+      html+=`<details class="exhibit-transcript"><summary>Source transcript</summary><div class="exhibit-transcript-body">${renderText(q.exhibitDesc)}</div></details>`;
+    } else if(q.exhibitDesc){
+      html+=renderText(q.exhibitDesc);
+    }
     html+='</div>';
     wrap.innerHTML=html;
     return wrap;
