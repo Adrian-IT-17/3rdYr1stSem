@@ -1147,6 +1147,15 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
         <span class="rev-stat-pill rev-stat-none" id="rev-score-NETWORKING">Not started</span>
       </div>
     </div>
+    <div class="reviewer-card" onclick="goTopics('NETWORKING_CORRECT')">
+      <div class="reviewer-icon">✅</div>
+      <div class="reviewer-title">CCST Networking Correct</div>
+      <div class="reviewer-desc">Technically correct CCST bank with source mistakes fixed and no reviewer-key flags.</div>
+      <div class="reviewer-stats" id="rev-stats-NETWORKING_CORRECT">
+        <span class="rev-stat-pill rev-stat-total" id="rev-total-NETWORKING_CORRECT">Loading modules</span>
+        <span class="rev-stat-pill rev-stat-none" id="rev-score-NETWORKING_CORRECT">Not started</span>
+      </div>
+    </div>
     <div class="reviewer-card" onclick="goTopics('IT0035')">
       <div class="reviewer-icon">💿</div>
       <div class="reviewer-title">IT0035</div>
@@ -1159,7 +1168,7 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
     <div class="reviewer-card" onclick="goTopics('IT0204')">
       <div class="reviewer-icon">🔐</div>
       <div class="reviewer-title">IT0204</div>
-      <div class="reviewer-desc">Practice questions loaded from the IT0204 FA1 markdown file.</div>
+      <div class="reviewer-desc">Practice questions loaded from the IT0204 formative assessment markdown files.</div>
       <div class="reviewer-stats" id="rev-stats-IT0204">
         <span class="rev-stat-pill rev-stat-total" id="rev-total-IT0204">Loading modules</span>
         <span class="rev-stat-pill rev-stat-none" id="rev-score-IT0204">Not started</span>
@@ -1833,14 +1842,19 @@ const SUBJECT_FILES = [
   {src:'IT0015', topic:'Formative Assessment 1', title:'IT0015 Networking FA1', file:'IT0015/FA1.md'},
   {src:'IT0015', topic:'Formative Assessment 2', title:'IT0015 Networking FA2', file:'IT0015/FA2.md'},
   {src:'NETWORKING', topic:'CCST Networking Cert', title:'CCST Networking Cert', file:'CCSTNETWORKINGCERT/Networking.md'},
+  {src:'NETWORKING_CORRECT', topic:'CCST Networking Correct', title:'CCST Networking Correct', file:'CCSTNETWORKINGCERT/Networking_correct.md'},
   {src:'IT0035', topic:'Canvas FA1', title:'Canvas FA1', file:'IT0035/FA1.md', forceTitle:true},
   {src:'IT0035', topic:'NetAcad NDG Exams', title:'NetAcad NDG Exams', file:'IT0035/NDGExams.md', prefixSections:true},
-  {src:'IT0204', topic:'Formative Assessment 1', title:'IT0204 Formative Assessment 1', file:'IT0204/IT0204/FA1.md'}
+  {src:'IT0204', topic:'Formative Assessment 1', title:'IT0204 Formative Assessment 1', file:'IT0204/IT0204/FA1.md'},
+  {src:'IT0204', topic:'Formative Assessment 2', title:'IT0204 Formative Assessment 2', file:'IT0204/IT0204/FA2.md'},
+  {src:'IT0204', topic:'Formative Assessment 3', title:'IT0204 Formative Assessment 3', file:'IT0204/IT0204/FA3.md'},
+  {src:'IT0204', topic:'Formative Assessment 4', title:'IT0204 Formative Assessment 4', file:'IT0204/IT0204/FA4.md'}
 ];
 
 const REVIEWER_META = {
   IT0015: {icon:'🖧', title:'IT0015 Networking', subtitle:'Class reviewer — Cisco commands, VLANs, trunking, topology'},
   NETWORKING: {icon:'🌐', title:'CCST Networking Cert', subtitle:'Certification question bank — CCST Networking'},
+  NETWORKING_CORRECT: {icon:'✅', title:'CCST Networking Correct', subtitle:'Corrected CCST Networking bank — technically accurate answers'},
   IT0035: {icon:'💿', title:'IT0035', subtitle:'Canvas FA1 and NetAcad NDG exams'},
   IT0204: {icon:'🔐', title:'IT0204', subtitle:'Cybersecurity, privacy law, and data protection'}
 };
@@ -2196,6 +2210,9 @@ function getNetworkingSubtopic(q){
   if(/cidr|subnet mask|subnetting|\/\d{1,2}\b|ipv4 address|ipv6 address|link-local ipv6|private network range|default gateway|network 172\.|192\.168\.200\.0\/24|172\.16\.|255\.255\./.test(text)) return 'Topic: IP Addressing & Subnetting';
   return 'Topic: General Networking';
 }
+function isNetworkingSource(src){
+  return src==='NETWORKING'||src==='NETWORKING_CORRECT';
+}
 
 function parseIT0015Md(md,fileMeta,startId){
   const titleMatch = md.match(/^#\s+(.+)$/m);
@@ -2288,7 +2305,13 @@ function exhibitDeviceSvg(q){
   return '';
 }
 function buildExhibit(q){
-  if(q && q.src==='NETWORKING' && (q.imageFile || q.exhibitDesc)){
+  if(q && isNetworkingSource(q.src) && q.sourceNum===52){
+    const wrap=document.createElement('div');
+    wrap.className='exhibit-box';
+    wrap.innerHTML=`<div class="exhibit-title">${esc(q.exhibitType||'Source Exhibit')}</div><div class="exhibit-content">${exhibitCCSTPoESwitch()}${q.exhibitDesc?`<details class="exhibit-transcript"><summary>Source transcript</summary><div class="exhibit-transcript-body">${renderText(q.exhibitDesc)}</div></details>`:''}</div>`;
+    return wrap;
+  }
+  if(q && isNetworkingSource(q.src) && (q.imageFile || q.exhibitDesc)){
     const wrap=document.createElement('div');
     wrap.className='exhibit-box';
     let html=`<div class="exhibit-title">${esc(q.exhibitType||'Source Exhibit')}</div><div class="exhibit-content">`;
@@ -2308,6 +2331,25 @@ function buildExhibit(q){
   wrap.className='exhibit-box';
   wrap.innerHTML=`<div class="exhibit-title">${esc(q.exhibitType||'Network Exhibit')}</div>${html}`;
   return wrap;
+}
+function exhibitCCSTPoESwitch(){
+  return `<div class="net-diagram"><svg class="net-svg" viewBox="0 0 760 300" role="img" aria-label="Reconstructed Cisco PoE switch front panel with numbered callouts">
+    <rect class="net-node switch" x="70" y="88" width="620" height="124" rx="8"/>
+    <text class="net-label" x="380" y="68" text-anchor="middle">Cisco PoE Switch Front Panel</text>
+    <rect class="net-node host" x="105" y="124" width="76" height="42" rx="5"/><text class="net-label" x="143" y="149" text-anchor="middle">2</text><text class="net-small" x="143" y="181" text-anchor="middle">console</text>
+    <rect class="net-node host" x="210" y="118" width="54" height="36" rx="5"/><text class="net-label" x="237" y="141" text-anchor="middle">3</text>
+    <rect class="net-node host" x="272" y="118" width="54" height="36" rx="5"/><text class="net-label" x="299" y="141" text-anchor="middle">4</text>
+    <text class="net-small" x="268" y="181" text-anchor="middle">management/function</text>
+    <g>
+      <rect class="net-node host" x="360" y="112" width="210" height="70" rx="6"/>
+      <text class="net-label" x="465" y="105" text-anchor="middle">6</text>
+      <text class="net-small" x="465" y="198" text-anchor="middle">RJ-45 PoE Ethernet ports</text>
+      <rect x="378" y="126" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="410" y="126" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="442" y="126" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="474" y="126" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="506" y="126" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="538" y="126" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/>
+      <rect x="378" y="150" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="410" y="150" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="442" y="150" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="474" y="150" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="506" y="150" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/><rect x="538" y="150" width="24" height="18" rx="2" fill="none" stroke="#52677d" stroke-width="2"/>
+    </g>
+    <rect class="net-node host" x="600" y="118" width="62" height="50" rx="5"/><text class="net-label" x="631" y="147" text-anchor="middle">7</text><text class="net-small" x="631" y="185" text-anchor="middle">SFP/fiber</text>
+    <text class="net-note" x="380" y="246" text-anchor="middle">Reconstructed from the source note: callout 6 is the PoE RJ-45 port group.</text>
+  </svg></div>`;
 }
 function exhibitSwitchTriangle(){
   return `<div class="net-diagram"><svg class="net-svg" viewBox="0 0 760 300" role="img" aria-label="Three switches in a triangle with S2 trunk links Gi0/1 and Gi0/2">
@@ -2445,7 +2487,7 @@ function parseNetworkingMd(md,fileMeta,startId){
       imageFile:imagePath,
       exhibitType:imageRequired?'Source Exhibit':'',
       exhibitDesc,
-      answerLabel:preparedAnswer.suggested?'Suggested Answer, Not From Source':networkingAnswerLabel(explanation)
+      answerLabel:fileMeta.src==='NETWORKING_CORRECT'?'Correct Answer':preparedAnswer.suggested?'Suggested Answer, Not From Source':networkingAnswerLabel(explanation)
     };
     q.sourceNum = sourceNum;
     const opts = readBankList(block,'Options').map(cleanBankText);
@@ -2500,7 +2542,7 @@ function addSubjectSubtopicGroups(src){
     const topic = src==='IT0015' ? getIT0015Subtopic(q) :
       src==='IT0035' ? getIT0035Subtopic(q) :
       src==='IT0204' ? getIT0204Subtopic(q) :
-      src==='NETWORKING' ? getNetworkingSubtopic(q) :
+      isNetworkingSource(src) ? getNetworkingSubtopic(q) :
       src==='APPDEV' ? getAppDevSubtopic(q) :
       src==='DIGITAL_FORENSICS' ? getDigitalForensicsSubtopic(q) :
       getEthicalHackerSubtopic(q);
@@ -2510,7 +2552,7 @@ function addSubjectSubtopicGroups(src){
 }
 async function loadMarkdownData(){
   Q.splice(0,Q.length);
-  TOPIC_GROUPS = {IT0015:{}, NETWORKING:{}, IT0035:{}, IT0204:{}};
+  TOPIC_GROUPS = {IT0015:{}, NETWORKING:{}, NETWORKING_CORRECT:{}, IT0035:{}, IT0204:{}};
   let nextId = 1;
   const loaded = [];
   for(const fileMeta of SUBJECT_FILES){
@@ -2518,9 +2560,9 @@ async function loadMarkdownData(){
       const res = await fetch(encodeURI(fileMeta.file));
       if(!res.ok) throw new Error(res.status+' '+res.statusText);
       const md = await res.text();
-      const parsed = fileMeta.src==='IT0015' ? parseIT0015Md(md,fileMeta,nextId) : fileMeta.src==='DIGITAL_FORENSICS' ? parseDigitalForensicsMd(md,fileMeta,nextId) : fileMeta.src==='NETWORKING' ? parseNetworkingMd(md,fileMeta,nextId) : parseMarkdownQuestions(md,fileMeta,nextId);
+      const parsed = fileMeta.src==='IT0015' ? parseIT0015Md(md,fileMeta,nextId) : fileMeta.src==='DIGITAL_FORENSICS' ? parseDigitalForensicsMd(md,fileMeta,nextId) : isNetworkingSource(fileMeta.src) ? parseNetworkingMd(md,fileMeta,nextId) : parseMarkdownQuestions(md,fileMeta,nextId);
       if(parsed.length){
-        if(fileMeta.src==='DIGITAL_FORENSICS' || fileMeta.src==='NETWORKING' || fileMeta.src==='IT0015'){
+        if(fileMeta.src==='DIGITAL_FORENSICS' || isNetworkingSource(fileMeta.src) || fileMeta.src==='IT0015'){
           const groups = {};
           parsed.forEach(q => {
             groups[q.moduleTitle] = groups[q.moduleTitle] || [];
@@ -2576,7 +2618,7 @@ function activeTopicKeys(groups){
   return specific.length ? specific : broadTopicKeys(groups);
 }
 function visibleTopicKeys(src, groups){
-  return src==='NETWORKING' ? specificTopicKeys(groups) : Object.keys(groups||{});
+  return isNetworkingSource(src) ? specificTopicKeys(groups) : Object.keys(groups||{});
 }
 function displayTopicLabel(topic){
   return String(topic||'').replace(/^Topic:\s*/,'');
@@ -2620,7 +2662,7 @@ function buildTopicGrid(src){
         const div = document.createElement('div');
         div.className = 'topic-divider';
         const firstLabel = src==='IT0035' ? 'Exam Sources' : 'Formative Assessments';
-        div.textContent = src==='NETWORKING' ? 'CCST Topic Filters' : isSubtopic ? 'Specific Topic Filters' : firstLabel;
+        div.textContent = isNetworkingSource(src) ? 'CCST Topic Filters' : isSubtopic ? 'Specific Topic Filters' : firstLabel;
         grid.appendChild(div);
       }
     }
@@ -2888,14 +2930,16 @@ function renderQ(){
   $('q-num-badge').textContent=`Q${session.idx+1}`;
   $('q-score').textContent=session.score;
   const answered=session.log.length;
-  const pctLive=answered>0?Math.round(session.score/answered*100):0;
-  if($('q-pct-live')) $('q-pct-live').textContent=answered>0?pctLive+'% ('+answered+' answered)':'Not started';
+  const scoredAnswered=session.log.filter(l=>!l.unscored).length;
+  const unscoredAnswered=answered-scoredAnswered;
+  const pctLive=scoredAnswered>0?Math.round(session.score/scoredAnswered*100):0;
+  if($('q-pct-live')) $('q-pct-live').textContent=answered>0?(scoredAnswered?pctLive+'% ('+scoredAnswered+' scored'+(unscoredAnswered?', '+unscoredAnswered+' self-check':'')+')':unscoredAnswered+' self-check'):'Not started';
   $('q-prog').style.width=(session.idx/total*100)+'%';
   $('q-prog-label').textContent=Math.round(session.idx/total*100)+'% complete';
   $('q-topic').textContent=q.topic;
   if($('q-warn')) $('q-warn').style.display=hasSourceCaution(q)?'':'none';
   if($('q-warn')) $('q-warn').textContent=q.flag?'Questionable':'Check Source';
-  const srcMap={IT0015:{label:'IT0015 Networking',color:'var(--accent)'},NETWORKING:{label:'CCST Cert',color:'#0a7c86'},IT0035:{label:'IT0035',color:'var(--orange)'},IT0204:{label:'IT0204',color:'var(--green)'}};
+  const srcMap={IT0015:{label:'IT0015 Networking',color:'var(--accent)'},NETWORKING:{label:'CCST Cert',color:'#0a7c86'},NETWORKING_CORRECT:{label:'CCST Correct',color:'var(--green)'},IT0035:{label:'IT0035',color:'var(--orange)'},IT0204:{label:'IT0204',color:'var(--green)'}};
   const src=srcMap[q.src]||{label:q.src,color:'var(--accent)'};
   $('q-src').textContent=src.label;
   if($('q-src-label')) $('q-src-label').textContent=src.label;
@@ -2971,15 +3015,17 @@ function buildCommand(q){
 function submitCommand(q,input,btn){
   const chosen=input.value;
   const accepted=(q.accept||[q.answer]).map(normalizeCommandAnswer);
-  const correct=q.selfCheck ? true : accepted.includes(normalizeCommandAnswer(chosen));
+  const unscored=!!q.selfCheck;
+  const correct=unscored ? false : accepted.includes(normalizeCommandAnswer(chosen));
   input.disabled=true;
   btn.disabled=true;
-  input.classList.add(correct?'ok':'err');
-  showFB(q.selfCheck?'partial':correct?'ok':'err',correct,q.ex,q,correct?null:[q.answer]);
-  if(correct && !q.selfCheck) session.score++;
+  input.classList.add(unscored||correct?'ok':'err');
+  showFB(unscored?'partial':correct?'ok':'err',correct,q.ex,q,correct?null:[q.answer]);
+  if(correct) session.score++;
   if(!correct) session.wrong.push(q.id);
-  session.log.push({id:q.id,correct,partial:q.selfCheck,chosen:[chosen]});
-  recordTopicStat(q,correct);
+  if(unscored) session.wrong=session.wrong.filter(id=>id!==q.id);
+  session.log.push({id:q.id,correct,partial:unscored,unscored,chosen:[chosen]});
+  if(!unscored) recordTopicStat(q,correct);
   showNext();
 }
 
@@ -3710,7 +3756,7 @@ function updateNavGrid(){
     if(isCurrent) btn.classList.add('current');
     else if(logEntry){
       if(logEntry.skipped) btn.classList.add('skipped');
-      else if(logEntry.correct) btn.classList.add('answered');
+      else if(logEntry.correct||logEntry.unscored) btn.classList.add('answered');
       else btn.classList.add('wrong');
     }
     if(isFlaggedQ) btn.classList.add('flagged');
@@ -3720,8 +3766,9 @@ function updateNavGrid(){
 // ═══ END QUIZ ═══
 function endQuiz(){
   clearInterval(timerInt);
-  const total=session.pool.length;
-  const ok=session.log.filter(l=>l.correct).length;
+  const unscored=session.log.filter(l=>l.unscored).length;
+  const total=session.log.filter(l=>!l.unscored).length;
+  const ok=session.log.filter(l=>!l.unscored&&l.correct).length;
   const pct=total>0?(ok/total)*100:0;
   const elapsed=Math.floor((Date.now()-session.startTime)/1000);
   const d=load();
@@ -3739,7 +3786,7 @@ function endQuiz(){
   $('r-pct').textContent=Math.round(pct)+'%';
   $('r-frac').textContent=ok+'/'+total;
   $('r-title').textContent=pct>=90?'🏆 Excellent!':pct>=75?'✓ Good work!':pct>=60?'📖 Keep studying':'❌ Needs work';
-  $('r-sub').textContent=`You answered ${ok} of ${total} questions correctly in ${fmt(elapsed)}.`;
+  $('r-sub').textContent=`You answered ${ok} of ${total} scored questions correctly in ${fmt(elapsed)}${unscored?`, with ${unscored} self-check item${unscored===1?'':'s'} unscored`:''}.`;
   $('r-ok').textContent=ok;
   $('r-no').textContent=total-ok;
   $('r-time').textContent=fmt(elapsed);
@@ -3818,8 +3865,9 @@ function showView(v){
 function buildReview(){
   const list=$('rev-list');
   list.innerHTML='';
-  const correct=session.log.filter(l=>l.correct);
-  const wrong=session.log.filter(l=>!l.correct);
+  const correct=session.log.filter(l=>!l.unscored&&l.correct);
+  const wrong=session.log.filter(l=>!l.unscored&&!l.correct);
+  const unscored=session.log.filter(l=>l.unscored);
   function addSection(title,items){
     if(!items.length)return;
     const sec=document.createElement('div');
@@ -3855,6 +3903,7 @@ function buildReview(){
     });
   }
   addSection('✓ Correct ('+correct.length+')',correct);
+  addSection('~ Self-check / Unscored ('+unscored.length+')',unscored);
   addSection('✗ Wrong / Skipped ('+wrong.length+')',wrong);
 }
 

@@ -971,3 +971,20 @@ There is also one answer I would investigate before locking #2 in: “How many V
 So my strongest candidate is Q17 (1006–4095) = False, while the second is most likely Q21 (DTP default) = False.
 
 For the Codex reviewer, I would not keep Q17 as True.
+
+
+## Identification Questions
+
+The following question numbers are identification / fill-in-the-blank questions and should NOT display multiple-choice options:
+
+- Q24 — "A switch build a MAC address table, also known as ___________."
+  - Answer: CAM table
+
+- Q40 — "To verify DTP mode. Use the ___________ command."
+  - Answer: show dtp interface
+
+For Q24 and Q40:
+- Set `Type: identification`
+- Display a text input field instead of multiple-choice buttons.
+- Require the student to type the answer.
+- Do not show answer choices.
