@@ -625,6 +625,17 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
 .command-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,102,204,.15)}
 .command-input.ok{border-color:var(--green-border);background:var(--green-bg)}
 .command-input.err{border-color:var(--red-border);background:var(--red-bg)}
+.ipcfg-panel{border:1px solid var(--card-border);background:var(--card);border-radius:8px;overflow:hidden;box-shadow:var(--card-shadow)}
+.ipcfg-title{padding:10px 14px;background:#eef4fb;border-bottom:1px solid var(--card-border);font-size:12px;font-weight:800;color:var(--header)}
+.ipcfg-body{padding:14px;display:flex;flex-direction:column;gap:12px}
+.ipcfg-section{border:1px solid var(--opt-border);border-radius:7px;padding:12px;background:var(--opt-bg)}
+.ipcfg-radio{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px}
+.ipcfg-grid{display:grid;grid-template-columns:160px 1fr;gap:9px 12px;align-items:center}
+.ipcfg-grid label{font-size:12px;color:var(--muted);font-weight:700}
+.ipcfg-input{width:100%;border:2px solid var(--opt-border);border-radius:7px;padding:10px 12px;font-family:var(--mono);font-size:14px;color:var(--text);background:var(--card)}
+.ipcfg-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,102,204,.15)}
+.ipcfg-input.ok{border-color:var(--green-border);background:var(--green-bg)}
+.ipcfg-input.err{border-color:var(--red-border);background:var(--red-bg)}
 @media(max-width:700px){.q-mobile-toggle{display:block!important}.qnav-card{grid-column:1/-1}.qnav-grid{max-height:126px;overflow:auto}.net-svg{height:330px}.net-diagram{min-height:330px;padding:10px}}
 
 
@@ -2195,7 +2206,8 @@ function getIT0204Subtopic(q){
 }
 function getNetworkingSubtopic(q){
   const n = q.sourceNum;
-  if([1,2,3,4,5,6,7,8,25,26,58,61,62].includes(n)) return 'Topic: IP Addressing & Subnetting';
+  if([51,52,56,57,62,65].includes(n)) return 'Topic: Manual IP Config & Part Identification';
+  if([1,2,3,4,5,6,7,8,25,26,58,61].includes(n)) return 'Topic: IP Addressing & Subnetting';
   if([9,10,11,14,15,23,28,32,67,68].includes(n)) return 'Topic: OSI, TCP/IP & Encapsulation';
   if([12,13,17,21,22,24,31,35,56,76,77,78,79,82,83,84,86].includes(n)) return 'Topic: Protocols & Commands';
   if(n>=36 && n<=47) return 'Topic: Security & Wireless';
@@ -2528,7 +2540,8 @@ function parseNetworkingMd(md,fileMeta,startId){
       q.answer=correct;
       q.accept=[correct];
       if(correct==='tcp.port == 7100') q.accept.push('tcp.port eq 7100');
-      q.selfCheck = sourceNum===62 || /IP address\s+—/i.test(correct);
+      q.ipConfig = sourceNum===62;
+      q.selfCheck = sourceNum===62 ? fileMeta.src==='NETWORKING' : /IP address\s+—/i.test(correct);
     }
     const ok = q.type==='match' ? q.pairs && q.pairs.length :
       q.type==='checkbox' ? q.opts && q.opts.length && q.ans && q.ans.length :
@@ -2962,7 +2975,7 @@ function renderQ(){
   const exhibit=buildExhibit(q);
   if(exhibit) body.appendChild(exhibit);
   body.appendChild(buildBody(q));
-  const hints={checkbox:`Select ${q.ans?q.ans.length:'?'} correct answers, then Submit`,'tf-grid':'Select Yes/True or No/False for each statement, then Submit','dd-grid':'Select an answer from each drop-down, then Submit','code-dd':'Select an answer from each inline drop-down, then Submit','token-drag':'Drag tokens into the slots, then Submit','drag-order':'Drag items into the correct order, then Submit',command:'Type the answer, then Submit',mc:'Click your answer'};
+  const hints={checkbox:`Select ${q.ans?q.ans.length:'?'} correct answers, then Submit`,'tf-grid':'Select Yes/True or No/False for each statement, then Submit','dd-grid':'Select an answer from each drop-down, then Submit','code-dd':'Select an answer from each inline drop-down, then Submit','token-drag':'Drag tokens into the slots, then Submit','drag-order':'Drag items into the correct order, then Submit',command:q.ipConfig?'Fill the IPv4 fields from the topology, then Submit':'Type the answer, then Submit',mc:'Click your answer'};
   $('q-hint').textContent=hints[q.type]||'';
   // Update flag button state
   const fb2=$('btn-flag');
@@ -2996,7 +3009,27 @@ function normalizeCommandAnswer(s){
     .replace(/\s+/g,' ')
     .trim();
 }
+function parseIPv4Address(value){
+  const parts=String(value||'').trim().split('.');
+  if(parts.length!==4) return null;
+  const nums=parts.map(p=>/^\d{1,3}$/.test(p)?Number(p):NaN);
+  if(nums.some(n=>!Number.isInteger(n)||n<0||n>255)) return null;
+  return nums;
+}
+function sameIPv4(value,expected){
+  const a=parseIPv4Address(value), b=parseIPv4Address(expected);
+  return !!a && !!b && a.every((n,i)=>n===b[i]);
+}
+function validPcAHostIp(value){
+  const ip=parseIPv4Address(value);
+  if(!ip) return false;
+  if(ip[0]!==172||ip[1]!==100) return false;
+  const text=ip.join('.');
+  if(text==='172.100.0.0'||text==='172.100.255.255'||text==='172.100.0.1'||text==='172.100.0.254') return false;
+  return true;
+}
 function buildCommand(q){
+  if(q.ipConfig) return buildIpConfigForm(q);
   const d=document.createElement('div');
   d.className='command-wrap';
   const input=document.createElement('input');
@@ -3014,6 +3047,75 @@ function buildCommand(q){
   d.appendChild(input);
   d.appendChild(btnRow);
   return d;
+}
+function buildIpConfigForm(q){
+  const d=document.createElement('div');
+  d.className='command-wrap';
+  d.innerHTML=`
+    <div class="ipcfg-panel">
+      <div class="ipcfg-title">Internet Protocol Version 4 (TCP/IPv4) Properties</div>
+      <div class="ipcfg-body">
+        <div class="ipcfg-section">
+          <div class="ipcfg-radio">● Use the following IP address:</div>
+          <div class="ipcfg-grid">
+            <label for="ipcfg-ip">IP address</label>
+            <input id="ipcfg-ip" class="ipcfg-input" data-field="ip" inputmode="decimal" autocomplete="off" placeholder="172.100.x.x">
+            <label for="ipcfg-mask">Subnet mask</label>
+            <input id="ipcfg-mask" class="ipcfg-input" data-field="mask" inputmode="decimal" autocomplete="off" placeholder="255.255.0.0">
+            <label for="ipcfg-gateway">Default gateway</label>
+            <input id="ipcfg-gateway" class="ipcfg-input" data-field="gateway" inputmode="decimal" autocomplete="off" placeholder="172.100.0.1">
+          </div>
+        </div>
+        <div class="ipcfg-section">
+          <div class="ipcfg-radio">● Use the following DNS server addresses:</div>
+          <div class="ipcfg-grid">
+            <label for="ipcfg-dns">Preferred DNS server</label>
+            <input id="ipcfg-dns" class="ipcfg-input" data-field="dns" inputmode="decimal" autocomplete="off" placeholder="172.100.0.254">
+          </div>
+        </div>
+      </div>
+    </div>`;
+  const inputs=[...d.querySelectorAll('.ipcfg-input')];
+  const btnRow=document.createElement('div');
+  btnRow.className='btn-row';
+  const sub=document.createElement('button');
+  sub.className='btn-sub';
+  sub.textContent=q.selfCheck?'Show Self-Check':'Submit';
+  inputs.forEach((input,idx)=>input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      if(idx<inputs.length-1) inputs[idx+1].focus();
+      else submitIpConfig(q,d,sub);
+    }
+  }));
+  sub.onclick=()=>submitIpConfig(q,d,sub);
+  btnRow.appendChild(sub);
+  d.appendChild(btnRow);
+  return d;
+}
+function submitIpConfig(q,wrap,btn){
+  const values={};
+  wrap.querySelectorAll('.ipcfg-input').forEach(input=>{values[input.dataset.field]=input.value.trim();});
+  const checks={
+    ip: validPcAHostIp(values.ip),
+    mask: sameIPv4(values.mask,'255.255.0.0'),
+    gateway: sameIPv4(values.gateway,'172.100.0.1'),
+    dns: sameIPv4(values.dns,'172.100.0.254')
+  };
+  const unscored=!!q.selfCheck;
+  const correct=!unscored && Object.values(checks).every(Boolean);
+  wrap.querySelectorAll('.ipcfg-input').forEach(input=>{
+    input.disabled=true;
+    input.classList.add(unscored||checks[input.dataset.field]?'ok':'err');
+  });
+  btn.disabled=true;
+  const chosen=`IP address: ${values.ip||'(blank)'}; Subnet mask: ${values.mask||'(blank)'}; Default gateway: ${values.gateway||'(blank)'}; DNS server: ${values.dns||'(blank)'}`;
+  showFB(unscored?'partial':correct?'ok':'err',correct,q.ex,q,correct?null:[q.answer]);
+  if(correct) session.score++;
+  if(!correct) session.wrong.push(q.id);
+  if(unscored) session.wrong=session.wrong.filter(id=>id!==q.id);
+  session.log.push({id:q.id,correct,partial:unscored,unscored,chosen:[chosen]});
+  if(!unscored) recordTopicStat(q,correct);
+  showNext();
 }
 function submitCommand(q,input,btn){
   const chosen=input.value;
