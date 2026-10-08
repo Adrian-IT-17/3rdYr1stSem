@@ -1884,6 +1884,9 @@ function readMdList(block,label){
   const section = readMdField(block,label);
   return section.split(/\n/).map(l=>l.trim()).filter(l=>l.startsWith('- ')).map(l=>l.slice(2).trim());
 }
+function splitMdAnswers(raw){
+  return String(raw||'').split(/\s*(?:;|,|\band\b|\&|\+)\s*/i).map(stripOptionPrefix).filter(Boolean);
+}
 function parseMarkdownQuestions(md,fileMeta,startId){
   const titleMatch = md.match(/^#\s+(.+)$/m);
   const fallbackTitle = fileMeta.forceTitle ? fileMeta.title : titleMatch ? titleMatch[1].trim() : fileMeta.title;
@@ -1911,7 +1914,7 @@ function parseMarkdownQuestions(md,fileMeta,startId){
       id:startId+i,
       src:fileMeta.src,
       topic:fileMeta.topic,
-      type:rawType==='multi'?'checkbox':rawType==='matching'?'match':'mc',
+      type:/^(multi|multiple|checkbox)$/.test(rawType)?'checkbox':rawType==='matching'?'match':'mc',
       q:qText,
       ex:explanation || 'No explanation provided.',
       moduleTitle:chunk.title,
@@ -1929,7 +1932,7 @@ function parseMarkdownQuestions(md,fileMeta,startId){
     } else {
       q.opts = readMdList(block,'Options').map(stripMd);
       const rawAnswer = readMdField(block,'Answer');
-      const answers = (q.type==='checkbox' ? rawAnswer.split(';') : [rawAnswer]).map(stripOptionPrefix).filter(Boolean);
+      const answers = q.type==='checkbox' ? splitMdAnswers(rawAnswer) : [rawAnswer].map(stripOptionPrefix).filter(Boolean);
       if(q.type==='checkbox'){
         q.ans = answers.map(a=>q.opts.findIndex(o=>stripOptionPrefix(o)===a)).filter(i=>i>=0);
       } else {
