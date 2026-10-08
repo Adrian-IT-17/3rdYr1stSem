@@ -444,6 +444,19 @@ input[type=radio].tfr{width:18px;height:18px;cursor:pointer;accent-color:var(--a
 .cable-memory{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 12px;border-bottom:1px solid var(--card-border);background:#fff}
 .cable-memory-card{border:1px solid var(--opt-border);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--muted);line-height:1.35;background:#fbfcfe}
 .cable-memory-card strong{display:block;color:var(--text);font-size:12px;margin-bottom:2px}
+.cable-decision-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px;background:#f8fafc}
+.cable-decision-card{border:2px solid var(--card-border);border-radius:8px;background:#fff;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:154px}
+.cable-decision-card.ok{border-color:var(--green-border);background:var(--green-bg)}
+.cable-decision-card.err{border-color:var(--red-border);background:var(--red-bg)}
+.cable-connection-num{font-family:var(--mono);font-size:11px;font-weight:900;color:var(--muted2);text-transform:uppercase}
+.cable-connection-title{font-size:14px;font-weight:900;color:var(--text);line-height:1.35}
+.cable-rule{font-size:12px;color:var(--muted);line-height:1.4;border-left:3px solid var(--opt-border);padding-left:9px}
+.cable-choice-row{display:grid;grid-template-columns:1fr;gap:6px;margin-top:auto}
+.cable-choice{border:2px solid var(--opt-border);border-radius:7px;background:#fff;color:var(--text);padding:8px 10px;font-size:12px;font-weight:800;text-align:left;cursor:pointer;display:flex;align-items:center;gap:8px}
+.cable-choice::before{content:"";width:18px;height:4px;border-radius:999px;background:#1f8f4d;box-shadow:0 1px 2px rgba(0,0,0,.18);flex-shrink:0}
+.cable-choice[data-cable="fiber"]::before{background:#2563eb}.cable-choice[data-cable="crossover"]::before{background:#d97706}
+.cable-choice.selected{border-color:var(--accent);background:var(--opt-hover-bg);color:var(--accent)}
+.cable-choice:disabled{cursor:default}
 .cable-canvas{position:relative;background:#d8e6f5;overflow:hidden}
 .cable-svg{display:block;width:100%;height:auto;min-height:430px;background:#d8e6f5}
 .cable-lines{pointer-events:none}
@@ -470,7 +483,7 @@ input[type=radio].tfr{width:18px;height:18px;cursor:pointer;accent-color:var(--a
 .cable-conn.ok{border-color:var(--green-border);background:var(--green-bg);color:var(--green)}
 .cable-conn.err{border-color:var(--red-border);background:var(--red-bg);color:var(--red)}
 .cable-remove{border:none;background:transparent;color:inherit;font-size:15px;cursor:pointer;font-weight:900}
-@media(max-width:700px){.cable-memory{grid-template-columns:1fr}.cable-port-legend{grid-template-columns:1fr 1fr}.cable-svg{min-height:500px}.cable-node .port-tag{font-size:11px}}
+@media(max-width:700px){.cable-memory,.cable-decision-grid{grid-template-columns:1fr}.cable-port-legend{grid-template-columns:1fr 1fr}.cable-svg{min-height:500px}.cable-node .port-tag{font-size:11px}}
 
 /* ═══ BUTTONS ═══ */
 .btn{padding:10px 20px;border-radius:7px;border:2px solid var(--opt-border);background:#fff;color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
@@ -3320,10 +3333,10 @@ function cableLabDefs(){
       {id:'server',num:8,dev:'Server0',port:'NIC',role:'server',x:780,y:365}
     ],
     required:[
-      {a:'s1',b:'r1a',cable:'straight',label:'Switch S1 to Router R1 Gi0/0/1'},
-      {a:'r2b',b:'r3',cable:'fiber',label:'Router R2 Gi0/0/0 to Router R3 Gi0/0/0 through the conduit'},
-      {a:'r1b',b:'r2a',cable:'crossover',label:'Router R1 Gi0/0/0 to Router R2 Gi0/0/1'},
-      {a:'s3b',b:'server',cable:'straight',label:'Switch S3 to Server0 NIC'}
+      {a:'s1',b:'r1a',cable:'straight',label:'Switch S1 to Router R1 Gi0/0/1',rule:'Switch to router = unlike devices, so use straight-through UTP.'},
+      {a:'r1b',b:'r2a',cable:'crossover',label:'Router R1 Gi0/0/0 to Router R2 Gi0/0/1',rule:'Router to router = like devices in the classic cabling rule, so use crossover UTP.'},
+      {a:'r2b',b:'r3',cable:'fiber',label:'Router R2 Gi0/0/0 to Router R3 Gi0/0/0 through the underground conduit',rule:'Long building-to-building conduit links use fiber optic cable.'},
+      {a:'s3b',b:'server',cable:'straight',label:'Switch S3 to Server0 NIC',rule:'Switch to server/host = unlike devices, so use straight-through UTP.'}
     ]
   };
 }
@@ -3380,67 +3393,83 @@ function cablePortLegend(defs){
 }
 function buildCableLab(q){
   const defs=cableLabDefs();
-  const state={cable:'straight',first:null,links:[]};
+  const state={answers:Array(defs.required.length).fill('')};
   const outer=document.createElement('div');
   const lab=document.createElement('div');
   lab.className='cable-lab';
-  const toolbar=document.createElement('div');
-  toolbar.className='cable-toolbar';
-  defs.cables.forEach(c=>{
-    const chip=document.createElement('button');
-    chip.type='button';
-    chip.className='cable-chip'+(c.id===state.cable?' active':'');
-    chip.dataset.cable=c.id;
-    chip.textContent=c.label;
-    chip.onclick=()=>{
-      state.cable=c.id;
-      toolbar.querySelectorAll('.cable-chip').forEach(btn=>btn.classList.toggle('active',btn.dataset.cable===c.id));
-    };
-    toolbar.appendChild(chip);
-  });
   const memory=document.createElement('div');
   memory.className='cable-memory';
   memory.innerHTML=`
     <div class="cable-memory-card"><strong>Unlike devices</strong>Switch to router or switch to host/server: straight-through UTP.</div>
     <div class="cable-memory-card"><strong>Like devices</strong>Router to router in the classic rule: crossover UTP.</div>
     <div class="cable-memory-card"><strong>Between buildings</strong>Long run through conduit: fiber optic cable.</div>`;
-  const canvas=document.createElement('div');
-  canvas.className='cable-canvas';
-  canvas.innerHTML=cableRackScene();
-  const portLayer=canvas.querySelector('.cable-port-layer');
-  defs.ports.forEach(p=>{
-    const node=document.createElementNS('http://www.w3.org/2000/svg','g');
-    node.className='cable-node';
-    node.dataset.port=p.id;
-    node.setAttribute('transform',`translate(${p.x} ${p.y})`);
-    node.innerHTML=`<title>${esc(p.dev+' '+p.port)}</title><circle class="port-dot" r="12"></circle><text class="port-tag" x="0" y="0">${p.num}</text>`;
-    node.onclick=()=>selectCablePort(q,state,defs,canvas,list,p.id);
-    portLayer.appendChild(node);
+  const grid=document.createElement('div');
+  grid.className='cable-decision-grid';
+  defs.required.forEach((req,i)=>{
+    const card=document.createElement('div');
+    card.className='cable-decision-card';
+    card.dataset.i=i;
+    card.innerHTML=`
+      <div class="cable-connection-num">Connection ${i+1}</div>
+      <div class="cable-connection-title">${esc(req.label)}</div>
+      <div class="cable-rule">${esc(req.rule)}</div>
+      <div class="cable-choice-row"></div>`;
+    const row=card.querySelector('.cable-choice-row');
+    defs.cables.forEach(c=>{
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='cable-choice';
+      btn.dataset.cable=c.id;
+      btn.textContent=c.label;
+      btn.onclick=()=>{
+        state.answers[i]=c.id;
+        row.querySelectorAll('.cable-choice').forEach(b=>b.classList.toggle('selected',b===btn));
+      };
+      row.appendChild(btn);
+    });
+    grid.appendChild(card);
   });
-  const legend=document.createElement('div');
-  legend.innerHTML=cablePortLegend(defs);
-  const list=document.createElement('div');
-  list.className='cable-connections';
   const btnRow=document.createElement('div');
   btnRow.className='btn-row';
   const sub=document.createElement('button');
   sub.className='btn-sub';
   sub.textContent='Submit';
-  sub.onclick=()=>submitCableLab(q,state,defs,lab,sub);
+  sub.onclick=()=>submitCableDecisionTrainer(q,state,defs,grid,sub);
   const rst=document.createElement('button');
   rst.className='btn-rst';
   rst.textContent='Reset';
-  rst.onclick=()=>{state.first=null;state.links=[];renderCableLab(state,defs,canvas,list);};
+  rst.onclick=()=>{
+    state.answers.fill('');
+    grid.querySelectorAll('.cable-decision-card').forEach(card=>card.classList.remove('ok','err'));
+    grid.querySelectorAll('.cable-choice').forEach(btn=>{btn.classList.remove('selected');btn.disabled=false;});
+    sub.disabled=false;
+  };
   btnRow.appendChild(sub);btnRow.appendChild(rst);
-  lab.appendChild(toolbar);
   lab.appendChild(memory);
-  lab.appendChild(canvas);
-  lab.appendChild(legend.firstElementChild);
-  lab.appendChild(list);
+  lab.appendChild(grid);
   outer.appendChild(lab);
   outer.appendChild(btnRow);
-  renderCableLab(state,defs,canvas,list);
   return outer;
+}
+function submitCableDecisionTrainer(q,state,defs,grid,btn){
+  let correct=0;
+  defs.required.forEach((req,i)=>{
+    const card=grid.querySelector(`.cable-decision-card[data-i="${i}"]`);
+    const ok=state.answers[i]===req.cable;
+    if(ok) correct++;
+    if(card) card.classList.add(ok?'ok':'err');
+  });
+  grid.querySelectorAll('.cable-choice').forEach(choice=>choice.disabled=true);
+  btn.disabled=true;
+  const allCorrect=correct===defs.required.length;
+  const partial=correct>0&&!allCorrect;
+  showFB(allCorrect?'ok':partial?'partial':'err',allCorrect,q.ex,q,null);
+  if(allCorrect) session.score++;
+  else if(partial) session.score+=correct/defs.required.length;
+  if(!allCorrect) session.wrong.push(q.id);
+  session.log.push({id:q.id,correct:allCorrect,partial,chosen:state.answers.slice()});
+  recordTopicStat(q,allCorrect);
+  showNext();
 }
 function selectCablePort(q,state,defs,canvas,list,portId){
   if(!state.first){
