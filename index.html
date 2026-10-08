@@ -444,34 +444,40 @@ input[type=radio].tfr{width:18px;height:18px;cursor:pointer;accent-color:var(--a
 .cable-memory{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 12px;border-bottom:1px solid var(--card-border);background:#fff}
 .cable-memory-card{border:1px solid var(--opt-border);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--muted);line-height:1.35;background:#fbfcfe}
 .cable-memory-card strong{display:block;color:var(--text);font-size:12px;margin-bottom:2px}
-.cable-canvas{position:relative;height:520px;background:linear-gradient(#f7fafc,#eef4fb);overflow:hidden}
+.cable-canvas{position:relative;height:430px;background:#d8e6f5;overflow:hidden}
 .cable-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .cable-line{stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
 .cable-line.straight{stroke:#1f8f4d}.cable-line.fiber{stroke:#2563eb}.cable-line.crossover{stroke:#d97706}
-.cable-node{position:absolute;transform:translate(-50%,-50%);border:2px solid #52677d;background:#fff;border-radius:8px;padding:6px 8px;min-width:124px;min-height:68px;font-size:10.5px;font-weight:800;color:var(--text);box-shadow:0 2px 7px rgba(0,0,0,.08);cursor:pointer;text-align:left}
-.cable-node:hover,.cable-node.selected{border-color:var(--accent);background:var(--opt-hover-bg);color:var(--accent)}
-.cable-node::before{content:"";position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid #52677d}
-.cable-node:hover::before,.cable-node.selected::before{border-color:var(--accent)}
-.cable-node .cable-dev{display:block;font-size:11.5px}
-.cable-node .cable-port{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
-.cable-node .cable-role{display:block;font-size:8.5px;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
-.cable-face{margin-top:5px;border:1px solid #b8c4d2;border-radius:5px;background:#eef2f7;padding:4px;display:grid;gap:3px}
-.cable-face.switch{grid-template-columns:repeat(6,1fr)}
-.cable-face.router{grid-template-columns:repeat(2,1fr)}
-.cable-face.server{grid-template-columns:1fr}
+.cable-node{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border:3px solid #52677d;background:#fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer;z-index:7}
+.cable-node:hover,.cable-node.selected{border-color:var(--accent);background:#eaf3ff}
+.cable-node .cable-dev{position:absolute;left:18px;top:-18px;min-width:92px;font-size:10px;font-weight:900;color:#0f2744;text-align:left;line-height:1.05;text-shadow:0 1px 0 #fff}
+.cable-node .cable-port{display:block;font-family:var(--mono);font-size:9px;color:#3d4b5c;margin-top:1px}
+.cable-node .cable-role{display:none}
 .port-hole{height:11px;border:1px solid #66758a;border-radius:3px;background:#1f2937;box-shadow:inset 0 2px 0 rgba(255,255,255,.15)}
 .port-hole.active{background:#fff7d6;border-color:#d97706;box-shadow:0 0 0 2px rgba(217,119,6,.18),inset 0 -3px 0 rgba(217,119,6,.35)}
 .port-hole.fiber{border-radius:999px;background:#1e3a8a}.port-hole.fiber.active{background:#dbeafe;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.2)}
 .port-hole.nic.active{background:#dcfce7;border-color:#1f8f4d;box-shadow:0 0 0 2px rgba(31,143,77,.18)}
-.cable-rack{position:absolute;border:2px solid #9aa8b8;background:rgba(255,255,255,.68);border-radius:8px;color:var(--muted);font-size:11px;font-weight:800;text-align:center;padding-top:10px}
-.cable-rack.left{left:3%;top:8%;width:42%;height:80%}.cable-rack.right{right:3%;top:8%;width:42%;height:80%}
-.cable-conduit{position:absolute;left:43%;top:58%;width:14%;height:42px;border-top:4px dashed #2563eb;border-bottom:4px dashed #2563eb;color:#2563eb;font-size:10px;font-weight:900;text-align:center;padding-top:10px;letter-spacing:.04em}
+.cable-rack{position:absolute;border:2px solid #48658c;background:#f5f8fb;border-radius:4px;color:#eaf3ff;font-size:11px;font-weight:900;text-align:center;padding-top:8px;box-shadow:inset 0 0 0 8px #173b72}
+.cable-rack.left{left:3%;top:8%;width:44%;height:76%}.cable-rack.right{right:3%;top:8%;width:44%;height:76%}
+.rack-title{position:absolute;top:7px;left:0;right:0;color:#eef5ff;font-size:10px;font-weight:900;text-align:center;z-index:2}
+.rack-rail{position:absolute;top:8%;bottom:16%;width:8px;background:#9b8b42;border-radius:2px}
+.rack-rail.left{left:5%}.rack-rail.right{right:5%}
+.rack-device{position:absolute;left:8%;right:8%;height:38px;border:2px solid #4c5b6e;border-radius:3px;background:#101827;box-shadow:0 1px 3px rgba(0,0,0,.25);z-index:1}
+.rack-device.light{background:#dfe6ee}.rack-device.server{height:104px;background:#657383}
+.rack-label{position:absolute;left:0;right:0;bottom:2px;color:#f8fafc;font-size:10px;font-weight:900;text-align:center;text-shadow:0 1px 1px rgba(0,0,0,.4)}
+.rack-device.light .rack-label{color:#24364c;text-shadow:none}
+.rack-ports{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;padding:8px 12px 0}
+.rack-ports.router{grid-template-columns:repeat(6,1fr);max-width:48%;padding-top:8px}
+.rack-ports.server{grid-template-columns:repeat(2,1fr);width:44px;position:absolute;right:9%;top:42px}
+.rack-hole{height:13px;border:1px solid #7d899a;border-radius:2px;background:#1f2937;box-shadow:inset 0 2px 0 rgba(255,255,255,.14)}
+.rack-hole.light{background:#eef2f7}.rack-hole.fiber{border-radius:999px;background:#1e3a8a}.rack-hole.server{height:18px;background:#cbd5e1}
+.cable-conduit{position:absolute;left:38%;bottom:6%;width:24%;height:24px;background:#111827;color:#e5edf8;font-size:10px;font-weight:900;text-align:center;padding-top:5px;letter-spacing:.04em;z-index:3}
 .cable-connections{padding:10px 12px;border-top:1px solid var(--card-border);display:flex;flex-direction:column;gap:6px;background:#fff}
 .cable-conn{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--opt-border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text)}
 .cable-conn.ok{border-color:var(--green-border);background:var(--green-bg);color:var(--green)}
 .cable-conn.err{border-color:var(--red-border);background:var(--red-bg);color:var(--red)}
 .cable-remove{border:none;background:transparent;color:inherit;font-size:15px;cursor:pointer;font-weight:900}
-@media(max-width:700px){.cable-memory{grid-template-columns:1fr}.cable-canvas{height:620px}.cable-node{min-width:112px;font-size:10px}.cable-node .cable-dev{font-size:11px}.cable-face.switch{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:700px){.cable-memory{grid-template-columns:1fr}.cable-canvas{height:520px}.cable-node .cable-dev{min-width:76px;font-size:9px}.rack-ports{gap:2px;padding-left:8px;padding-right:8px}}
 
 /* ═══ BUTTONS ═══ */
 .btn{padding:10px 20px;border-radius:7px;border:2px solid var(--opt-border);background:#fff;color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
@@ -3311,14 +3317,14 @@ function cableLabDefs(){
       {id:'crossover',label:'Crossover UTP Cable'}
     ],
     ports:[
-      {id:'s1',dev:'Switch S1',port:'access/uplink port',role:'switch',x:16,y:25},
-      {id:'r1a',dev:'Router R1',port:'Gi0/0/1',role:'router',x:38,y:25},
-      {id:'r1b',dev:'Router R1',port:'Gi0/0/0',role:'router',x:16,y:50},
-      {id:'r2a',dev:'Router R2',port:'Gi0/0/1',role:'router',x:38,y:50},
-      {id:'r2b',dev:'Router R2',port:'Gi0/0/0',role:'router',x:28,y:76},
-      {id:'r3',dev:'Router R3',port:'Gi0/0/0',role:'router',x:70,y:25},
-      {id:'s3b',dev:'Switch S3',port:'access port',role:'switch',x:62,y:69},
-      {id:'server',dev:'Server0',port:'NIC',role:'server',x:84,y:69}
+      {id:'s1',dev:'S1',port:'switch port',role:'switch',x:23,y:44},
+      {id:'r1a',dev:'R1',port:'Gi0/0/1',role:'router',x:23,y:61},
+      {id:'r1b',dev:'R1',port:'Gi0/0/0',role:'router',x:27,y:61},
+      {id:'r2a',dev:'R2',port:'Gi0/0/1',role:'router',x:27,y:73},
+      {id:'r2b',dev:'R2',port:'Gi0/0/0',role:'router',x:31,y:73},
+      {id:'r3',dev:'R3',port:'Gi0/0/0',role:'router',x:70,y:31},
+      {id:'s3b',dev:'S3',port:'switch port',role:'switch',x:72,y:45},
+      {id:'server',dev:'Server0',port:'NIC',role:'server',x:82,y:63}
     ],
     required:[
       {a:'s1',b:'r1a',cable:'straight',label:'Switch S1 to Router R1 Gi0/0/1'},
@@ -3329,20 +3335,28 @@ function cableLabDefs(){
   };
 }
 function cableKey(a,b){return [a,b].sort().join('|');}
-function cableDeviceFace(p){
-  const kind=p.role==='switch'?'switch':p.role==='server'?'server':'router';
-  const count=kind==='switch'?12:kind==='router'?2:1;
-  const active=kind==='switch' ? (p.id==='s1'?3:8) : kind==='router' ? (/0\/1$/.test(p.port)?1:0) : 0;
-  let html=`<span class="cable-face ${kind}" aria-hidden="true">`;
-  for(let i=0;i<count;i++){
-    const cls=['port-hole'];
-    if(i===active) cls.push('active');
-    if(p.id==='r3'||p.id==='r2b') cls.push('fiber');
-    if(kind==='server') cls.push('nic');
-    html+=`<span class="${cls.join(' ')}"></span>`;
-  }
-  html+='</span>';
-  return html;
+function rackHoles(count,cls=''){
+  return Array.from({length:count},()=>`<span class="rack-hole ${cls}"></span>`).join('');
+}
+function cableRackScene(){
+  return `
+    <div class="cable-rack left">
+      <div class="rack-title">Distribution Rack 1 - Building 5</div><div class="rack-rail left"></div><div class="rack-rail right"></div>
+      <div class="rack-device light" style="top:11%"><div class="rack-ports">${rackHoles(12,'light')}</div><div class="rack-label">Power Distribution Device0</div></div>
+      <div class="rack-device" style="top:30%"><div class="rack-ports">${rackHoles(12)}</div><div class="rack-label">S2</div></div>
+      <div class="rack-device" style="top:42%"><div class="rack-ports">${rackHoles(12)}</div><div class="rack-label">S1</div></div>
+      <div class="rack-device light" style="top:59%"><div class="rack-ports router">${rackHoles(4,'light')}${rackHoles(2,'fiber')}</div><div class="rack-label">R1</div></div>
+      <div class="rack-device light" style="top:72%"><div class="rack-ports router">${rackHoles(4,'light')}${rackHoles(2,'fiber')}</div><div class="rack-label">R2</div></div>
+    </div>
+    <div class="cable-rack right">
+      <div class="rack-title">Data Center Rack 2 - Building 1</div><div class="rack-rail left"></div><div class="rack-rail right"></div>
+      <div class="rack-device light" style="top:11%"><div class="rack-ports">${rackHoles(12,'light')}</div><div class="rack-label">Patch Panel</div></div>
+      <div class="rack-device light" style="top:28%"><div class="rack-ports router">${rackHoles(4,'light')}${rackHoles(2,'fiber')}</div><div class="rack-label">R3</div></div>
+      <div class="rack-device" style="top:42%"><div class="rack-ports">${rackHoles(12)}</div><div class="rack-label">S3</div></div>
+      <div class="rack-device server" style="top:59%"><div class="rack-ports server">${rackHoles(2,'server')}</div><div class="rack-label">Server0</div></div>
+    </div>
+    <div class="cable-conduit">Underground Conduit</div>
+    <svg class="cable-lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>`;
 }
 function buildCableLab(q){
   const defs=cableLabDefs();
@@ -3372,7 +3386,7 @@ function buildCableLab(q){
     <div class="cable-memory-card"><strong>Between buildings</strong>Long run through conduit: fiber optic cable.</div>`;
   const canvas=document.createElement('div');
   canvas.className='cable-canvas';
-  canvas.innerHTML='<div class="cable-rack left">Distribution Rack 1 - Building 5</div><div class="cable-rack right">Data Center Rack 2 - Building 1</div><div class="cable-conduit">UNDERGROUND CONDUIT</div><svg class="cable-lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>';
+  canvas.innerHTML=cableRackScene();
   defs.ports.forEach(p=>{
     const node=document.createElement('button');
     node.type='button';
@@ -3380,7 +3394,7 @@ function buildCableLab(q){
     node.dataset.port=p.id;
     node.style.left=p.x+'%';
     node.style.top=p.y+'%';
-    node.innerHTML=`<span class="cable-dev">${esc(p.dev)}</span><span class="cable-port">${esc(p.port)}</span><span class="cable-role">${esc(p.role)}</span>${cableDeviceFace(p)}`;
+    node.innerHTML=`<span class="cable-dev">${esc(p.dev)}<span class="cable-port">${esc(p.port)}</span></span>`;
     node.onclick=()=>selectCablePort(q,state,defs,canvas,list,p.id);
     canvas.appendChild(node);
   });
