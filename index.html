@@ -436,11 +436,6 @@ input[type=radio].tfr{width:18px;height:18px;cursor:pointer;accent-color:var(--a
 .drag-slot.filled{border-style:solid;border-color:var(--opt-border)}
 .slot-n{position:absolute;top:4px;left:8px;font-size:9px;font-family:var(--mono);color:var(--muted2);pointer-events:none;font-weight:700}
 .cable-lab{border:1px solid var(--card-border);border-radius:8px;background:#fff;overflow:hidden}
-.cable-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:12px;border-bottom:1px solid var(--card-border);background:#f8fafc}
-.cable-chip{border:2px solid var(--opt-border);background:#fff;border-radius:7px;padding:9px 12px;font-family:var(--font);font-size:13px;font-weight:800;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:7px}
-.cable-chip::before{content:"";width:18px;height:4px;border-radius:999px;background:#1f8f4d;box-shadow:0 1px 2px rgba(0,0,0,.18)}
-.cable-chip[data-cable="fiber"]::before{background:#2563eb}.cable-chip[data-cable="crossover"]::before{background:#d97706}
-.cable-chip.active{border-color:var(--accent);background:var(--opt-hover-bg);color:var(--accent)}
 .cable-memory{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 12px;border-bottom:1px solid var(--card-border);background:#fff}
 .cable-memory-card{border:1px solid var(--opt-border);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--muted);line-height:1.35;background:#fbfcfe}
 .cable-memory-card strong{display:block;color:var(--text);font-size:12px;margin-bottom:2px}
@@ -457,33 +452,7 @@ input[type=radio].tfr{width:18px;height:18px;cursor:pointer;accent-color:var(--a
 .cable-choice[data-cable="fiber"]::before{background:#2563eb}.cable-choice[data-cable="crossover"]::before{background:#d97706}
 .cable-choice.selected{border-color:var(--accent);background:var(--opt-hover-bg);color:var(--accent)}
 .cable-choice:disabled{cursor:default}
-.cable-canvas{position:relative;background:#d8e6f5;overflow:hidden}
-.cable-svg{display:block;width:100%;height:auto;min-height:430px;background:#d8e6f5}
-.cable-lines{pointer-events:none}
-.cable-line{stroke-width:6;stroke-linecap:round;fill:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.22))}
-.cable-line.straight{stroke:#1f8f4d}.cable-line.fiber{stroke:#2563eb}.cable-line.crossover{stroke:#d97706}
-.cable-node{cursor:pointer}
-.cable-node .port-dot{fill:#fff;stroke:#52677d;stroke-width:4;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
-.cable-node:hover .port-dot,.cable-node.selected .port-dot{fill:#eaf3ff;stroke:var(--accent)}
-.cable-node .port-tag{font:900 12px var(--mono);fill:#0f2744;text-anchor:middle;dominant-baseline:central;pointer-events:none}
-.rack-shell{fill:#f5f8fb;stroke:#1d2d6d;stroke-width:8}
-.rack-title-svg{font:900 13px var(--font);fill:#eef5ff}
-.rack-rail-svg{fill:#9b8b42}
-.rack-device-svg{fill:#111827;stroke:#4c5b6e;stroke-width:2}
-.rack-device-svg.light{fill:#dfe6ee}.rack-device-svg.server{fill:#687586}
-.rack-label-svg{font:900 12px var(--font);fill:#f8fafc}.rack-label-svg.dark{fill:#24364c}
-.rack-port-svg{fill:#172033;stroke:#7d899a;stroke-width:1.2}.rack-port-svg.light{fill:#eef2f7}.rack-port-svg.fiber{fill:#1e3a8a}.rack-port-svg.server{fill:#cbd5e1}
-.conduit-svg{fill:#111827}.conduit-label-svg{font:900 13px var(--font);fill:#e5edf8}
-.cable-port-legend{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 12px;border-top:1px solid var(--card-border);background:#f8fafc}
-.cable-port-key{display:flex;align-items:center;gap:8px;border:1px solid var(--opt-border);border-radius:6px;background:#fff;padding:7px 9px;font-size:11px;color:var(--muted);line-height:1.25}
-.cable-port-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #52677d;color:#0f2744;font-family:var(--mono);font-size:11px;font-weight:900;flex-shrink:0}
-.cable-port-key strong{display:block;color:var(--text);font-size:11px}
-.cable-connections{padding:10px 12px;border-top:1px solid var(--card-border);display:flex;flex-direction:column;gap:6px;background:#fff}
-.cable-conn{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--opt-border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text)}
-.cable-conn.ok{border-color:var(--green-border);background:var(--green-bg);color:var(--green)}
-.cable-conn.err{border-color:var(--red-border);background:var(--red-bg);color:var(--red)}
-.cable-remove{border:none;background:transparent;color:inherit;font-size:15px;cursor:pointer;font-weight:900}
-@media(max-width:700px){.cable-memory,.cable-decision-grid{grid-template-columns:1fr}.cable-port-legend{grid-template-columns:1fr 1fr}.cable-svg{min-height:500px}.cable-node .port-tag{font-size:11px}}
+@media(max-width:700px){.cable-memory,.cable-decision-grid{grid-template-columns:1fr}}
 
 /* ═══ BUTTONS ═══ */
 .btn{padding:10px 20px;border-radius:7px;border:2px solid var(--opt-border);background:#fff;color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
@@ -3340,57 +3309,6 @@ function cableLabDefs(){
     ]
   };
 }
-function cableKey(a,b){return [a,b].sort().join('|');}
-function svgPorts(x,y,count,cls=''){
-  return Array.from({length:count},(_,i)=>`<rect class="rack-port-svg ${cls}" x="${x+i*18}" y="${y}" width="12" height="10" rx="2"/>`).join('');
-}
-function svgDevice({x,y,w,h,label,light=false,server=false,ports=''}) {
-  const cls='rack-device-svg'+(light?' light':'')+(server?' server':'');
-  const labelCls='rack-label-svg'+(light?' dark':'');
-  return `<g>
-    <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>
-    ${ports}
-    <text class="${labelCls}" x="${x+w/2}" y="${y+h-7}" text-anchor="middle">${esc(label)}</text>
-  </g>`;
-}
-function cableRackScene(){
-  return `
-    <svg class="cable-svg" viewBox="0 0 900 520" role="img" aria-label="Simplified two-rack cabling lab">
-      <rect x="0" y="0" width="900" height="520" fill="#d8e6f5"/>
-      <g>
-        <rect class="rack-shell" x="35" y="46" width="360" height="390" rx="4"/>
-        <text class="rack-title-svg" x="215" y="72" text-anchor="middle">Distribution Rack 1 - Building 5</text>
-        <rect class="rack-rail-svg" x="54" y="92" width="8" height="288" rx="2"/>
-        <rect class="rack-rail-svg" x="368" y="92" width="8" height="288" rx="2"/>
-        ${svgDevice({x:75,y:86,w:280,h:48,label:'Power Distribution Device0',light:true,ports:svgPorts(96,103,12,'light')})}
-        ${svgDevice({x:75,y:170,w:280,h:46,label:'S2',ports:svgPorts(96,185,12)})}
-        ${svgDevice({x:75,y:230,w:280,h:46,label:'S1',ports:svgPorts(96,245,12)})}
-        ${svgDevice({x:75,y:315,w:280,h:52,label:'R1',light:true,ports:svgPorts(94,332,5,'light')+svgPorts(210,332,2,'fiber')})}
-        ${svgDevice({x:75,y:378,w:280,h:52,label:'R2',light:true,ports:svgPorts(94,395,5,'light')+svgPorts(210,395,2,'fiber')})}
-      </g>
-      <g>
-        <rect class="rack-shell" x="505" y="46" width="360" height="390" rx="4"/>
-        <text class="rack-title-svg" x="685" y="72" text-anchor="middle">Data Center Rack 2 - Building 1</text>
-        <rect class="rack-rail-svg" x="524" y="92" width="8" height="288" rx="2"/>
-        <rect class="rack-rail-svg" x="838" y="92" width="8" height="288" rx="2"/>
-        ${svgDevice({x:545,y:86,w:280,h:48,label:'Patch Panel',light:true,ports:svgPorts(566,103,12,'light')})}
-        ${svgDevice({x:545,y:150,w:280,h:52,label:'R3',light:true,ports:svgPorts(564,167,5,'light')+svgPorts(680,167,2,'fiber')})}
-        ${svgDevice({x:545,y:230,w:280,h:46,label:'S3',ports:svgPorts(566,245,12)})}
-        ${svgDevice({x:545,y:315,w:280,h:106,label:'Server0',server:true,ports:'<rect class="rack-port-svg server" x="750" y="355" width="58" height="20" rx="3"/><rect class="rack-port-svg server" x="676" y="350" width="12" height="38" rx="2"/><rect class="rack-port-svg server" x="696" y="350" width="12" height="38" rx="2"/>'})}
-      </g>
-      <rect class="conduit-svg" x="340" y="468" width="220" height="28" rx="2"/>
-      <text class="conduit-label-svg" x="450" y="487" text-anchor="middle">Underground Conduit</text>
-      <g class="cable-lines"></g>
-      <g class="cable-port-layer"></g>
-    </svg>`;
-}
-function cablePortLegend(defs){
-  return `<div class="cable-port-legend">${defs.ports.map(p=>`
-    <div class="cable-port-key">
-      <span class="cable-port-num">${p.num}</span>
-      <span><strong>${esc(p.dev)}</strong>${esc(p.port)}</span>
-    </div>`).join('')}</div>`;
-}
 function buildCableLab(q){
   const defs=cableLabDefs();
   const state={answers:Array(defs.required.length).fill('')};
@@ -3468,69 +3386,6 @@ function submitCableDecisionTrainer(q,state,defs,grid,btn){
   else if(partial) session.score+=correct/defs.required.length;
   if(!allCorrect) session.wrong.push(q.id);
   session.log.push({id:q.id,correct:allCorrect,partial,chosen:state.answers.slice()});
-  recordTopicStat(q,allCorrect);
-  showNext();
-}
-function selectCablePort(q,state,defs,canvas,list,portId){
-  if(!state.first){
-    state.first=portId;
-    renderCableLab(state,defs,canvas,list);
-    return;
-  }
-  if(state.first===portId){
-    state.first=null;
-    renderCableLab(state,defs,canvas,list);
-    return;
-  }
-  const key=cableKey(state.first,portId);
-  state.links=state.links.filter(link=>cableKey(link.a,link.b)!==key);
-  state.links.push({a:state.first,b:portId,cable:state.cable});
-  state.first=null;
-  renderCableLab(state,defs,canvas,list);
-}
-function renderCableLab(state,defs,canvas,list){
-  canvas.querySelectorAll('.cable-node').forEach(node=>node.classList.toggle('selected',node.dataset.port===state.first));
-  const svg=canvas.querySelector('.cable-lines');
-  const byPort=Object.fromEntries(defs.ports.map(p=>[p.id,p]));
-  svg.innerHTML=state.links.map(link=>{
-    const a=byPort[link.a], b=byPort[link.b];
-    const key=cableKey(link.a,link.b);
-    if(link.cable==='fiber' && key===cableKey('r2b','r3')){
-      return `<path class="cable-line ${esc(link.cable)}" d="M ${a.x} ${a.y} L ${a.x} 468 L 450 468 L ${b.x} 468 L ${b.x} ${b.y}"></path>`;
-    }
-    return `<line class="cable-line ${esc(link.cable)}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"></line>`;
-  }).join('');
-  list.innerHTML=state.links.length ? state.links.map((link,i)=>{
-    const a=byPort[link.a], b=byPort[link.b];
-    const cable=(defs.cables.find(c=>c.id===link.cable)||{}).label||link.cable;
-    return `<div class="cable-conn" data-i="${i}"><span>${esc(cable)}: ${esc(a.dev)} ${esc(a.port)} to ${esc(b.dev)} ${esc(b.port)}</span><button type="button" class="cable-remove" data-i="${i}">x</button></div>`;
-  }).join('') : '<div class="cable-conn">Select a cable type, then click the two ports/devices to connect.</div>';
-  list.querySelectorAll('.cable-remove').forEach(btn=>btn.onclick=()=>{
-    state.links.splice(Number(btn.dataset.i),1);
-    renderCableLab(state,defs,canvas,list);
-  });
-}
-function submitCableLab(q,state,defs,lab,btn){
-  const required=new Map(defs.required.map(r=>[cableKey(r.a,r.b),r]));
-  let correct=0;
-  lab.querySelectorAll('.cable-conn').forEach(el=>el.classList.remove('ok','err'));
-  state.links.forEach((link,i)=>{
-    const req=required.get(cableKey(link.a,link.b));
-    const ok=!!req && req.cable===link.cable;
-    if(ok) correct++;
-    const row=lab.querySelector(`.cable-conn[data-i="${i}"]`);
-    if(row) row.classList.add(ok?'ok':'err');
-  });
-  lab.querySelectorAll('.cable-chip,.cable-remove').forEach(el=>el.disabled=true);
-  lab.querySelectorAll('.cable-node').forEach(el=>{el.style.pointerEvents='none';});
-  btn.disabled=true;
-  const allCorrect=correct===defs.required.length && state.links.length===defs.required.length;
-  const partial=correct>0&&!allCorrect;
-  showFB(allCorrect?'ok':partial?'partial':'err',allCorrect,q.ex,q,null);
-  if(allCorrect) session.score++;
-  else if(partial) session.score+=correct/defs.required.length;
-  if(!allCorrect) session.wrong.push(q.id);
-  session.log.push({id:q.id,correct:allCorrect,partial,chosen:state.links.map(l=>`${l.cable}:${l.a}-${l.b}`)});
   recordTopicStat(q,allCorrect);
   showNext();
 }
