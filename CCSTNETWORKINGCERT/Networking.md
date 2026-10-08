@@ -1550,7 +1550,15 @@ RIGHT: network topology. Top right: an Internet cloud connected to an "ISP" rout
 
 **Answer:** NO ANSWER SHOWN IN THE PDF. Suggested answer (derived from the diagram): IP address — any unused host address in 172.100.0.0/16 (for example 172.100.0.10, not .1 or .254); Subnet mask — 255.255.0.0; Default gateway — 172.100.0.1 (Router1 G0/0); DNS server — the DNS server value shown in the dialog.
 
-**Explanation:** Because there is no DHCP server, PC-A needs manual IPv4 settings. The host IP must be an unused address in the LAN `172.100.0.0/16`; it cannot reuse Router1's `172.100.0.1` or the server's `172.100.0.254`. The subnet mask for `/16` is `255.255.0.0`. The default gateway must be Router1's LAN-facing interface, `172.100.0.1`, because that is how PC-A reaches other networks and the internet. DNS should use the DNS/server value shown in the dialog or topology, but the source image is low resolution, so treat that part as suggested rather than confirmed.
+**Explanation:** PC-A has no DHCP server, so you must type the IPv4 settings manually.
+
+Use these fields:
+IP address: choose any unused host address in `172.100.0.0/16`, such as `172.100.0.10`.
+Subnet mask: `255.255.0.0`, because `/16` means the first two octets are the network.
+Default gateway: `172.100.0.1`, because this is Router1's LAN interface.
+Preferred DNS server: use the DNS/server value shown in the dialog or topology. The corrected bank uses `172.100.0.254`.
+
+Do not use `172.100.0.1` as the PC address because it belongs to Router1. Do not use `172.100.0.254` as the PC address if the question treats it as the server address.
 
 **⚠ Flag:** NOTE: The slide shows only the question and the graphic; the answer is not written on it. In the dialog graphic, the Preferred DNS server field is already filled and reads approximately "172 . 100 . 025 . 4" (low resolution; likely meant to be 172.100.0.254, the server shown on the LAN). Treat the suggested answer above as unverified.
 
