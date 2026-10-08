@@ -3639,7 +3639,7 @@ function showFB(status,correct,ex,q,correctAnswers){
   const icons={ok:'✓ Correct!',err:'✗ Incorrect.',partial:'~ Partial credit.'};
   const caution = sourceCautionText(q);
   fb.className='fb show '+status+(caution?' has-source-warning':'');
-  let html=`<strong>${icons[status]}</strong> <span class="fb-explain-label">Reviewer/PDF explanation</span>${renderInlineCode(ex)}`;
+  let html=`<strong>${icons[status]}</strong> <span class="fb-explain-label">Reviewer/PDF explanation</span>${renderText(ex)}`;
   if(caution) html+=`<div class="fb-source-note"><span class="fb-source-label">Source warning / questionable item</span>${esc(caution)}</div>`;
   // Always show full answer preview
   html+='<div class="fb-preview">';
