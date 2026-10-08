@@ -2984,7 +2984,7 @@ function renderQ(){
   $('q-fb').innerHTML='';
   $('btn-skip').style.display='';
   $('btn-next').style.display='none';
-  const typeNames={mc:'Multiple Choice',checkbox:'Choose Multiple','tf-grid':'True / False','dd-grid':'Drop-Down','code-dd':'Code Drop-Down','token-drag':'Drag & Drop','drag-order':'Arrange in Order','match':'Match',command:'Command'};
+  const typeNames={mc:'Multiple Choice',checkbox:'Choose Multiple','tf-grid':'True / False','dd-grid':'Drop-Down','code-dd':'Code Drop-Down','token-drag':'Drag & Drop','drag-order':'Arrange in Order','match':q.cableLab?'Cabling Lab':'Match',command:'Command'};
   const typeClasses={mc:'ql-mc',checkbox:'ql-cb','tf-grid':'ql-tf','dd-grid':'ql-dd','code-dd':'ql-dd','token-drag':'ql-drag','drag-order':'ql-drag','match':'ql-drag',command:'ql-dd'};
   const tb=$('q-type');
   tb.textContent=typeNames[q.type]||q.type;
@@ -2993,8 +2993,13 @@ function renderQ(){
   const body=$('q-body');
   body.innerHTML='';
   const exhibit=buildExhibit(q);
-  if(exhibit) body.appendChild(exhibit);
-  body.appendChild(buildBody(q));
+  if(q.cableLab){
+    body.appendChild(buildBody(q));
+    if(exhibit) body.appendChild(exhibit);
+  } else {
+    if(exhibit) body.appendChild(exhibit);
+    body.appendChild(buildBody(q));
+  }
   const hints={checkbox:`Select ${q.ans?q.ans.length:'?'} correct answers, then Submit`,'tf-grid':'Select Yes/True or No/False for each statement, then Submit','dd-grid':'Select an answer from each drop-down, then Submit','code-dd':'Select an answer from each inline drop-down, then Submit','token-drag':'Drag tokens into the slots, then Submit','drag-order':'Drag items into the correct order, then Submit','match':q.cableLab?'Choose a cable type, click two ports/devices to connect them, then Submit':'Match each item, then Submit',command:q.ipConfig?'Fill the IPv4 fields from the topology, then Submit':'Type the answer, then Submit',mc:'Click your answer'};
   $('q-hint').textContent=hints[q.type]||'';
   // Update flag button state
