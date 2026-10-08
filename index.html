@@ -444,17 +444,25 @@ input[type=radio].tfr{width:18px;height:18px;cursor:pointer;accent-color:var(--a
 .cable-memory{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 12px;border-bottom:1px solid var(--card-border);background:#fff}
 .cable-memory-card{border:1px solid var(--opt-border);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--muted);line-height:1.35;background:#fbfcfe}
 .cable-memory-card strong{display:block;color:var(--text);font-size:12px;margin-bottom:2px}
-.cable-canvas{position:relative;height:420px;background:linear-gradient(#f7fafc,#eef4fb);overflow:hidden}
+.cable-canvas{position:relative;height:460px;background:linear-gradient(#f7fafc,#eef4fb);overflow:hidden}
 .cable-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .cable-line{stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
 .cable-line.straight{stroke:#1f8f4d}.cable-line.fiber{stroke:#2563eb}.cable-line.crossover{stroke:#d97706}
-.cable-node{position:absolute;transform:translate(-50%,-50%);border:2px solid #52677d;background:#fff;border-radius:8px;padding:8px 10px;min-width:112px;min-height:46px;font-size:11px;font-weight:800;color:var(--text);box-shadow:0 2px 7px rgba(0,0,0,.08);cursor:pointer;text-align:left}
+.cable-node{position:absolute;transform:translate(-50%,-50%);border:2px solid #52677d;background:#fff;border-radius:8px;padding:7px 9px;min-width:142px;min-height:76px;font-size:11px;font-weight:800;color:var(--text);box-shadow:0 2px 7px rgba(0,0,0,.08);cursor:pointer;text-align:left}
 .cable-node:hover,.cable-node.selected{border-color:var(--accent);background:var(--opt-hover-bg);color:var(--accent)}
 .cable-node::before{content:"";position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid #52677d}
 .cable-node:hover::before,.cable-node.selected::before{border-color:var(--accent)}
 .cable-node .cable-dev{display:block;font-size:12px}
 .cable-node .cable-port{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
 .cable-node .cable-role{display:block;font-size:9px;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.cable-face{margin-top:6px;border:1px solid #b8c4d2;border-radius:5px;background:#eef2f7;padding:5px;display:grid;gap:4px}
+.cable-face.switch{grid-template-columns:repeat(6,1fr)}
+.cable-face.router{grid-template-columns:repeat(2,1fr)}
+.cable-face.server{grid-template-columns:1fr}
+.port-hole{height:13px;border:1px solid #66758a;border-radius:3px;background:#1f2937;box-shadow:inset 0 2px 0 rgba(255,255,255,.15)}
+.port-hole.active{background:#fff7d6;border-color:#d97706;box-shadow:0 0 0 2px rgba(217,119,6,.18),inset 0 -3px 0 rgba(217,119,6,.35)}
+.port-hole.fiber{border-radius:999px;background:#1e3a8a}.port-hole.fiber.active{background:#dbeafe;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.2)}
+.port-hole.nic.active{background:#dcfce7;border-color:#1f8f4d;box-shadow:0 0 0 2px rgba(31,143,77,.18)}
 .cable-rack{position:absolute;border:2px solid #9aa8b8;background:rgba(255,255,255,.68);border-radius:8px;color:var(--muted);font-size:11px;font-weight:800;text-align:center;padding-top:10px}
 .cable-rack.left{left:3%;top:8%;width:42%;height:80%}.cable-rack.right{right:3%;top:8%;width:42%;height:80%}
 .cable-conduit{position:absolute;left:43%;top:56%;width:14%;height:42px;border-top:4px dashed #2563eb;border-bottom:4px dashed #2563eb;color:#2563eb;font-size:10px;font-weight:900;text-align:center;padding-top:10px;letter-spacing:.04em}
@@ -463,7 +471,7 @@ input[type=radio].tfr{width:18px;height:18px;cursor:pointer;accent-color:var(--a
 .cable-conn.ok{border-color:var(--green-border);background:var(--green-bg);color:var(--green)}
 .cable-conn.err{border-color:var(--red-border);background:var(--red-bg);color:var(--red)}
 .cable-remove{border:none;background:transparent;color:inherit;font-size:15px;cursor:pointer;font-weight:900}
-@media(max-width:700px){.cable-memory{grid-template-columns:1fr}.cable-canvas{height:520px}.cable-node{min-width:96px;font-size:10px}.cable-node .cable-dev{font-size:11px}}
+@media(max-width:700px){.cable-memory{grid-template-columns:1fr}.cable-canvas{height:560px}.cable-node{min-width:118px;font-size:10px}.cable-node .cable-dev{font-size:11px}.cable-face.switch{grid-template-columns:repeat(4,1fr)}}
 
 /* ═══ BUTTONS ═══ */
 .btn{padding:10px 20px;border-radius:7px;border:2px solid var(--opt-border);background:#fff;color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
@@ -3321,6 +3329,21 @@ function cableLabDefs(){
   };
 }
 function cableKey(a,b){return [a,b].sort().join('|');}
+function cableDeviceFace(p){
+  const kind=p.role==='switch'?'switch':p.role==='server'?'server':'router';
+  const count=kind==='switch'?12:kind==='router'?2:1;
+  const active=kind==='switch' ? (p.id==='s1'?3:8) : kind==='router' ? (/0\/1$/.test(p.port)?1:0) : 0;
+  let html=`<span class="cable-face ${kind}" aria-hidden="true">`;
+  for(let i=0;i<count;i++){
+    const cls=['port-hole'];
+    if(i===active) cls.push('active');
+    if(p.id==='r3'||p.id==='r2b') cls.push('fiber');
+    if(kind==='server') cls.push('nic');
+    html+=`<span class="${cls.join(' ')}"></span>`;
+  }
+  html+='</span>';
+  return html;
+}
 function buildCableLab(q){
   const defs=cableLabDefs();
   const state={cable:'straight',first:null,links:[]};
@@ -3357,7 +3380,7 @@ function buildCableLab(q){
     node.dataset.port=p.id;
     node.style.left=p.x+'%';
     node.style.top=p.y+'%';
-    node.innerHTML=`<span class="cable-dev">${esc(p.dev)}</span><span class="cable-port">${esc(p.port)}</span><span class="cable-role">${esc(p.role)}</span>`;
+    node.innerHTML=`<span class="cable-dev">${esc(p.dev)}</span><span class="cable-port">${esc(p.port)}</span><span class="cable-role">${esc(p.role)}</span>${cableDeviceFace(p)}`;
     node.onclick=()=>selectCablePort(q,state,defs,canvas,list,p.id);
     canvas.appendChild(node);
   });
