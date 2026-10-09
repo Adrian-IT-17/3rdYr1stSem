@@ -2249,6 +2249,11 @@ function getIT0049Subtopic(q){
   if(/form|validation|validate|csrf|post|old\(|upload|file|getfile|move|delete action|crud|redirect|flash/.test(text)) return 'Topic: Forms, Validation, Uploads & CRUD';
   return 'Topic: CodeIgniter Fundamentals';
 }
+function isIT0049Identification(q){
+  const stem = (q.q||'').toLowerCase();
+  if(q.type==='command') return true;
+  return /^(which description matches|what is the name of|what term describes|what architectural pattern|what does .+ stand for|which function|which property|which query builder method|which codeigniter file|which form attribute|what codeigniter constant|what helper|what file input form encoding|which codeigniter helper function|which codeigniter uploadedfile method)/.test(stem);
+}
 function getNetworkingSubtopic(q){
   const n = q.sourceNum;
   if([51,52,56,57,62,65].includes(n)) return 'Topic: Identification & Manual IP Config';
@@ -2611,6 +2616,11 @@ function addSubjectSubtopicGroups(src){
       getEthicalHackerSubtopic(q);
     if(!TOPIC_GROUPS[src][topic]) TOPIC_GROUPS[src][topic]=[];
     TOPIC_GROUPS[src][topic].push(q.id);
+    if(src==='IT0049' && isIT0049Identification(q)){
+      const identificationTopic = 'Topic: Identification';
+      if(!TOPIC_GROUPS[src][identificationTopic]) TOPIC_GROUPS[src][identificationTopic]=[];
+      TOPIC_GROUPS[src][identificationTopic].push(q.id);
+    }
   });
 }
 async function loadMarkdownData(){
