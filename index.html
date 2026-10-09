@@ -1203,6 +1203,15 @@ kbd{display:inline-block;padding:1px 5px;background:var(--opt-bg);border:1px sol
         <span class="rev-stat-pill rev-stat-none" id="rev-score-IT0204">Not started</span>
       </div>
     </div>
+    <div class="reviewer-card" onclick="goTopics('IT0049')">
+      <div class="reviewer-icon">🧩</div>
+      <div class="reviewer-title">IT0049</div>
+      <div class="reviewer-desc">Practice questions loaded from CodeIgniter formative assessment attempts.</div>
+      <div class="reviewer-stats" id="rev-stats-IT0049">
+        <span class="rev-stat-pill rev-stat-total" id="rev-total-IT0049">Loading modules</span>
+        <span class="rev-stat-pill rev-stat-none" id="rev-score-IT0049">Not started</span>
+      </div>
+    </div>
   </div>
   <div class="hist-wrap">
     <div class="hist-top"><div class="hist-lbl">Score History</div><div class="hist-subject" id="hist-subject">Current subject</div></div>
@@ -1877,7 +1886,11 @@ const SUBJECT_FILES = [
   {src:'IT0204', topic:'Formative Assessment 1', title:'IT0204 Formative Assessment 1', file:'IT0204/IT0204/FA1.md'},
   {src:'IT0204', topic:'Formative Assessment 2', title:'IT0204 Formative Assessment 2', file:'IT0204/IT0204/FA2.md'},
   {src:'IT0204', topic:'Formative Assessment 3', title:'IT0204 Formative Assessment 3', file:'IT0204/IT0204/FA3.md'},
-  {src:'IT0204', topic:'Formative Assessment 4', title:'IT0204 Formative Assessment 4', file:'IT0204/IT0204/FA4.md'}
+  {src:'IT0204', topic:'Formative Assessment 4', title:'IT0204 Formative Assessment 4', file:'IT0204/IT0204/FA4.md'},
+  {src:'IT0049', topic:'Formative Assessment 1', title:'IT0049 Formative Assessment 1', file:'IT0049/IT0049/fa1.md'},
+  {src:'IT0049', topic:'Formative Assessment 2', title:'IT0049 Formative Assessment 2', file:'IT0049/IT0049/fa2.md'},
+  {src:'IT0049', topic:'Formative Assessment 3', title:'IT0049 Formative Assessment 3', file:'IT0049/IT0049/fa3.md'},
+  {src:'IT0049', topic:'Formative Assessment 4', title:'IT0049 Formative Assessment 4', file:'IT0049/IT0049/fa4.md'}
 ];
 
 const REVIEWER_META = {
@@ -1885,7 +1898,8 @@ const REVIEWER_META = {
   NETWORKING: {icon:'🌐', title:'CCST Networking Cert', subtitle:'Certification question bank — CCST Networking'},
   NETWORKING_CORRECT: {icon:'✅', title:'CCST Networking Correct', subtitle:'Corrected CCST Networking bank — technically accurate answers'},
   IT0035: {icon:'💿', title:'IT0035', subtitle:'Canvas FA1 and NetAcad NDG exams'},
-  IT0204: {icon:'🔐', title:'IT0204', subtitle:'Cybersecurity, privacy law, and data protection'}
+  IT0204: {icon:'🔐', title:'IT0204', subtitle:'Cybersecurity, privacy law, and data protection'},
+  IT0049: {icon:'🧩', title:'IT0049', subtitle:'CodeIgniter 4, MVC, routes, models, validation, and CRUD'}
 };
 
 function stripMd(s){
@@ -1943,7 +1957,7 @@ function parseMarkdownQuestions(md,fileMeta,startId){
       id:startId+i,
       src:fileMeta.src,
       topic:fileMeta.topic,
-      type:/^(multi|multiple|checkbox)$/.test(rawType)?'checkbox':rawType==='matching'?'match':'mc',
+      type:/^(multi|multiple|checkbox)$/.test(rawType)?'checkbox':rawType==='matching'?'match':/^(fill|fill-in|fill in|fill-in-the-blank|command|typed)$/.test(rawType)?'command':'mc',
       q:qText,
       ex:explanation || 'No explanation provided.',
       moduleTitle:chunk.title,
@@ -1958,6 +1972,11 @@ function parseMarkdownQuestions(md,fileMeta,startId){
       q.pool = pairs.map(p=>({id:p.id,label:p.desc}));
       q.slots = pairs.length;
       q.ans = pairs.map(p=>p.id);
+    } else if(q.type==='command'){
+      const rawAnswer = readMdField(block,'Answer');
+      const answer = stripMd(stripOptionPrefix(rawAnswer));
+      q.answer = answer;
+      q.accept = answer ? [answer] : [];
     } else {
       q.opts = readMdList(block,'Options').map(stripMd);
       const rawAnswer = readMdField(block,'Answer');
@@ -1972,6 +1991,7 @@ function parseMarkdownQuestions(md,fileMeta,startId){
   }).filter(q=>{
     if(q.type==='match') return q.pairs && q.pairs.length;
     if(q.type==='checkbox') return q.opts && q.opts.length && q.ans && q.ans.length;
+    if(q.type==='command') return q.answer;
     return q.opts && q.opts.length && q.ans>=0;
   });
 }
@@ -2222,9 +2242,16 @@ function getIT0204Subtopic(q){
   if(/encryption|pseudonymization|confidentiality|integrity|availability|cia triad|unauthorized access/.test(text)) return 'Topic: Security Controls & CIA Triad';
   return 'Topic: General Cybersecurity & Privacy';
 }
+function getIT0049Subtopic(q){
+  const text = (q.q+' '+(q.ex||'')+' '+(q.opts||[]).join(' ')+' '+(q.answer||'')).toLowerCase();
+  if(/route|routes\.php|controller|method|url|mvc|view\(|model-view-controller|document root|public folder|app\/config/.test(text)) return 'Topic: MVC, Routes & Views';
+  if(/model|database|table|query|findall|find\(|insert|update|delete|allowedfields|primarykey|entity|record/.test(text)) return 'Topic: Models, Database & Query Builder';
+  if(/form|validation|validate|csrf|post|old\(|upload|file|getfile|move|delete action|crud|redirect|flash/.test(text)) return 'Topic: Forms, Validation, Uploads & CRUD';
+  return 'Topic: CodeIgniter Fundamentals';
+}
 function getNetworkingSubtopic(q){
   const n = q.sourceNum;
-  if([51,52,56,57,62,65].includes(n)) return 'Topic: Manual IP Config & Part Identification';
+  if([51,52,56,57,62,65].includes(n)) return 'Topic: Identification & Manual IP Config';
   if([1,2,3,4,5,6,7,8,25,26,58,61].includes(n)) return 'Topic: IP Addressing & Subnetting';
   if([9,10,11,14,15,23,28,32,67,68].includes(n)) return 'Topic: OSI, TCP/IP & Encapsulation';
   if([12,13,17,21,22,24,31,35,56,76,77,78,79,82,83,84,86].includes(n)) return 'Topic: Protocols & Commands';
@@ -2577,6 +2604,7 @@ function addSubjectSubtopicGroups(src){
     const topic = src==='IT0015' ? getIT0015Subtopic(q) :
       src==='IT0035' ? getIT0035Subtopic(q) :
       src==='IT0204' ? getIT0204Subtopic(q) :
+      src==='IT0049' ? getIT0049Subtopic(q) :
       isNetworkingSource(src) ? getNetworkingSubtopic(q) :
       src==='APPDEV' ? getAppDevSubtopic(q) :
       src==='DIGITAL_FORENSICS' ? getDigitalForensicsSubtopic(q) :
@@ -2587,7 +2615,7 @@ function addSubjectSubtopicGroups(src){
 }
 async function loadMarkdownData(){
   Q.splice(0,Q.length);
-  TOPIC_GROUPS = {IT0015:{}, NETWORKING:{}, NETWORKING_CORRECT:{}, IT0035:{}, IT0204:{}};
+  TOPIC_GROUPS = {IT0015:{}, NETWORKING:{}, NETWORKING_CORRECT:{}, IT0035:{}, IT0204:{}, IT0049:{}};
   let nextId = 1;
   const loaded = [];
   for(const fileMeta of SUBJECT_FILES){
@@ -2974,7 +3002,7 @@ function renderQ(){
   $('q-topic').textContent=q.topic;
   if($('q-warn')) $('q-warn').style.display=hasSourceCaution(q)?'':'none';
   if($('q-warn')) $('q-warn').textContent=q.flag?'Questionable':'Check Source';
-  const srcMap={IT0015:{label:'IT0015 Networking',color:'var(--accent)'},NETWORKING:{label:'CCST Cert',color:'#0a7c86'},NETWORKING_CORRECT:{label:'CCST Correct',color:'var(--green)'},IT0035:{label:'IT0035',color:'var(--orange)'},IT0204:{label:'IT0204',color:'var(--green)'}};
+  const srcMap={IT0015:{label:'IT0015 Networking',color:'var(--accent)'},NETWORKING:{label:'CCST Cert',color:'#0a7c86'},NETWORKING_CORRECT:{label:'CCST Correct',color:'var(--green)'},IT0035:{label:'IT0035',color:'var(--orange)'},IT0204:{label:'IT0204',color:'var(--green)'},IT0049:{label:'IT0049',color:'#7c3aed'}};
   const src=srcMap[q.src]||{label:q.src,color:'var(--accent)'};
   $('q-src').textContent=src.label;
   if($('q-src-label')) $('q-src-label').textContent=src.label;
@@ -2999,7 +3027,7 @@ function renderQ(){
     if(exhibit) body.appendChild(exhibit);
     body.appendChild(buildBody(q));
   }
-  const hints={checkbox:`Select ${q.ans?q.ans.length:'?'} correct answers, then Submit`,'tf-grid':'Select Yes/True or No/False for each statement, then Submit','dd-grid':'Select an answer from each drop-down, then Submit','code-dd':'Select an answer from each inline drop-down, then Submit','token-drag':'Drag tokens into the slots, then Submit','drag-order':'Drag items into the correct order, then Submit','match':q.cableLab?'Choose a cable type, click two ports/devices to connect them, then Submit':'Match each item, then Submit',command:q.ipConfig?'Fill the IPv4 fields from the topology, then Submit':'Type the answer, then Submit',mc:'Click your answer'};
+  const hints={checkbox:`Select ${q.ans?q.ans.length:'?'} correct answers, then Submit`,'tf-grid':'Select Yes/True or No/False for each statement, then Submit','dd-grid':'Select an answer from each drop-down, then Submit','code-dd':'Select an answer from each inline drop-down, then Submit','token-drag':'Drag tokens into the slots, then Submit','drag-order':'Drag items into the correct order, then Submit','match':q.cableLab?'Pick the correct cable type for each connection, then Submit':'Match each item, then Submit',command:q.ipConfig?'Fill the IPv4 fields from the topology, then Submit':'Type the answer, then Submit',mc:'Click your answer'};
   $('q-hint').textContent=hints[q.type]||'';
   // Update flag button state
   const fb2=$('btn-flag');
