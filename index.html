@@ -2252,7 +2252,7 @@ function getIT0049Subtopic(q){
 function isIT0049Identification(q){
   const stem = (q.q||'').toLowerCase();
   if(q.type==='command') return true;
-  return /^(which description matches|what is the name of|what term describes|what architectural pattern|what does .+ stand for|which function|which property|which query builder method|which codeigniter file|which form attribute|what codeigniter constant|what helper|what file input form encoding|which codeigniter helper function|which codeigniter uploadedfile method)/.test(stem);
+  return /^(which description matches|what is the name of|what is the safest general description|what is the main purpose|what is the primary purpose|what term describes|what architectural pattern|what does .+ stand for|which function|which property|which query builder method|which codeigniter file|which form attribute|what codeigniter constant|what helper|what file input form encoding|which codeigniter helper function|which codeigniter uploadedfile method)/.test(stem);
 }
 function getNetworkingSubtopic(q){
   const n = q.sourceNum;
